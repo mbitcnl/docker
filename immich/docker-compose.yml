@@ -11,7 +11,11 @@ name: immich
 services:
   immich-server:
     container_name: immich_server
+    hostname: immich
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+    networks:
+      - proxy-network
+      - default
     # extends:
     #   file: hwaccel.transcoding.yml
     #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
@@ -89,3 +93,7 @@ services:
 
 volumes:
   model-cache:
+
+networks:
+  proxy-network:
+    external: true
