@@ -23,8 +23,8 @@ services:
       # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
-    env_file:
-      - /data_pool1/apps/portainer/compose/stack.env
+    #env_file:
+    #  - /data_pool1/apps/portainer/compose/stack.env
     ports:
       - '2283:2283'
     depends_on:
@@ -44,8 +44,8 @@ services:
     #   service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
     volumes:
       - model-cache:/cache
-    env_file:
-      - /data_pool1/apps/portainer/compose/stack.env
+    #env_file:
+    #  - /data_pool1/apps/portainer/compose/stack.env
     restart: always
     healthcheck:
       disable: false
