@@ -1,6 +1,5 @@
 # Docker containers
-In this section i have al used docker containers what i use in my own environment, i use docker-compose or portainer i.c.m with git integration
-
+In this section, I have listed all the docker containers I use in my own environment. I use docker-compose or portainer i.c.m with git integration.
 
 ## Immich: A Self-Hosted Photo and Video Backup Solution
 
