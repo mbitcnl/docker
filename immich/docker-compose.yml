@@ -24,7 +24,7 @@ services:
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
     env_file:
-      - .env
+      - /data_pool1/apps/portainer/compose/stack.env
     ports:
       - '2283:2283'
     depends_on:
@@ -45,7 +45,7 @@ services:
     volumes:
       - model-cache:/cache
     env_file:
-      - .env
+      - /data_pool1/apps/portainer/compose/stack.env
     restart: always
     healthcheck:
       disable: false
