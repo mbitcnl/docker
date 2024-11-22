@@ -36,6 +36,12 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
+      - DB_HOSTNAME=${DB_HOSTNAME}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE_NAME=${DB_DATABASE_NAME}
+      - DB_PORT=${DB_PORT}
+      - NODE_ENV=${NODE_ENV}
 
   immich-machine-learning:
     container_name: immich_machine_learning
