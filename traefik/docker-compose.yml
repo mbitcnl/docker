@@ -11,7 +11,6 @@ services:
       - "--entrypoints.web.address=:${TRAEFIK_ENTRYPOINT_HTTP}"
       - "--entrypoints.websecure.address=:${TRAEFIK_ENTRYPOINT_HTTPS}"
       - "--providers.docker=true"
-      - "--providers.docker.swarmmode=true" # Swarm-modus inschakelen
       - "--providers.docker.exposedbydefault=false"
       - "--accesslog=true"
       - "--log.level=DEBUG"
