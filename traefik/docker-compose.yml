@@ -16,7 +16,7 @@ services:
       - "--accesslog=true"
       - "--log.level=DEBUG"
       - "--certificatesresolvers.default.acme.tlschallenge=true"
-      - "--certificatesresolvers.default.acme.email=your-email@example.com"
+      - "--certificatesresolvers.default.acme.email=${TRAEFIK_LETSENCRYPT_MAIL}"
       - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
     ports:
       - target: ${TRAEFIK_ENTRYPOINT_HTTP}
@@ -39,14 +39,14 @@ services:
       - "traefik.enable=true"
 
       # Router configuratie voor het dashboard
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.mademy.nl`)"
+      - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
       - "traefik.http.routers.dashboard.service=api@internal"
 
       # Middleware koppelen (IP-whitelist en Basic Auth)
       - "traefik.http.routers.dashboard.middlewares=ip-whitelist@docker,auth@docker"
 
       # IPWhitelist Middleware
-      - "traefik.http.middlewares.ip-whitelist.ipwhitelist.sourcerange=192.168.1.0/24,203.0.113.42"
+      - "traefik.http.middlewares.ip-whitelist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
 
       # Basic Auth Middleware
       - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
