@@ -37,9 +37,19 @@ services:
       - TRAEFIK_ENTRYPOINT_HTTPS=${TRAEFIK_ENTRYPOINT_HTTPS}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`)"
+
+      # Router configuratie voor het dashboard
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.mademy.nl`)"
       - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD}"
+
+      # Middleware koppelen (IP-whitelist en Basic Auth)
+      - "traefik.http.routers.dashboard.middlewares=ip-whitelist@docker,auth@docker"
+
+      # IPWhitelist Middleware
+      - "traefik.http.middlewares.ip-whitelist.ipwhitelist.sourcerange=192.168.1.0/24,203.0.113.42"
+
+      # Basic Auth Middleware
+      - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
 
 networks:
   traefik-proxy:
