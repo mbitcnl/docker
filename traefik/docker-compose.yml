@@ -45,7 +45,7 @@ services:
       - "traefik.http.routers.dashboard.middlewares=ip-allowlist@docker,auth@docker"
 
       # IPWhitelist Middleware
-      - "traefik.http.middlewares.ip-whitelist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
+      - "traefik.http.middlewares.ip-allowlist.ipallowlist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
 
       # Basic Auth Middleware
       - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
