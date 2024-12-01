@@ -1,0 +1,46 @@
+## Deze config is alleen voor Docker swarm
+
+version: "3.9"
+
+services:
+  traefik:
+    image: "traefik:${TRAEFIK_VERSION}"
+    command:
+      - "--api=true"
+      - "--api.dashboard=true"
+      - "--entrypoints.web.address=:${TRAEFIK_ENTRYPOINT_HTTP}"
+      - "--entrypoints.websecure.address=:${TRAEFIK_ENTRYPOINT_HTTPS}"
+      - "--providers.docker=true"
+      - "--providers.docker.swarmmode=true" # Swarm-modus inschakelen
+      - "--providers.docker.exposedbydefault=false"
+      - "--accesslog=true"
+      - "--log.level=DEBUG"
+      - "--certificatesresolvers.default.acme.tlschallenge=true"
+      - "--certificatesresolvers.default.acme.email=your-email@example.com"
+      - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - target: ${TRAEFIK_ENTRYPOINT_HTTP}
+        published: ${TRAEFIK_ENTRYPOINT_HTTP}
+        mode: host
+      - target: ${TRAEFIK_ENTRYPOINT_HTTPS}
+        published: ${TRAEFIK_ENTRYPOINT_HTTPS}
+        mode: host
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+    deploy:
+      mode: global # Draai Traefik op alle nodes
+    networks:
+      - traefik-proxy
+    environment:
+      - TRAEFIK_ENTRYPOINT_HTTP=${TRAEFIK_ENTRYPOINT_HTTP}
+      - TRAEFIK_ENTRYPOINT_HTTPS=${TRAEFIK_ENTRYPOINT_HTTPS}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD}"
+
+networks:
+  traefik-proxy:
+    driver: overlay # Overlay-netwerk voor Swarm
