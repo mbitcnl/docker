@@ -27,7 +27,7 @@ services:
         mode: host
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./letsencrypt:/letsencrypt"
+      - "/nfs/portainer/letsencrypt:/letsencrypt"
     deploy:
       mode: global # Draai Traefik op alle nodes
     networks:
