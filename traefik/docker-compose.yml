@@ -42,7 +42,7 @@ services:
       - "traefik.http.routers.dashboard.service=api@internal"
 
       # Middleware koppelen (IP-whitelist en Basic Auth)
-      - "traefik.http.routers.dashboard.middlewares=ip-whitelist@docker,auth@docker"
+      - "traefik.http.routers.dashboard.middlewares=ip-allowlist@docker,auth@docker"
 
       # IPWhitelist Middleware
       - "traefik.http.middlewares.ip-whitelist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
