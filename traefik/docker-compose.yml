@@ -1,4 +1,4 @@
-## Deze config is alleen voor Docker swarm
+## Deze config is alleen voor Docker Swarm
 
 version: "3.9"
 
@@ -28,7 +28,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "/nfs/portainer/letsencrypt:/letsencrypt"
     deploy:
-      mode: global # Draai Traefik op alle nodes
+      mode: global
     networks:
       - traefik-proxy
     environment:
@@ -40,15 +40,23 @@ services:
       # Router configuratie voor het dashboard
       - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
       - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=websecure" # Alleen HTTPS entrypoint
+      - "traefik.http.routers.dashboard.tls=true" # Forceer TLS/HTTPS
 
-      # Middleware koppelen (IP-whitelist en Basic Auth)
+      # Middleware koppelen (IPAllowList en Basic Auth)
       - "traefik.http.routers.dashboard.middlewares=ip-allowlist@docker,auth@docker"
 
-      # IPWhitelist Middleware
+      # IPAllowList Middleware
       - "traefik.http.middlewares.ip-allowlist.ipallowlist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
 
       # Basic Auth Middleware
       - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
+
+      # Redirect van HTTP naar HTTPS
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
 
 networks:
   traefik-proxy:
