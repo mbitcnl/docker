@@ -25,27 +25,10 @@ services:
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
-    environment:
-      - OLLAMA_API_BASE_URL=http://ollama:11434/api
-      - WEBUI_JWT_SECRET_KEY=${WEBUI_JWT_SECRET_KEY}
-      - WEBUI_DB_PATH=/app/backend/data/database.db
-      - WEBUI_AUTH=true
-      - WEBUI_HOST=0.0.0.0
-      - WEBUI_PORT=8080
-      - WEBUI_DEBUG=false
-      - LOG_LEVEL=info
-      - WEBUI_APP_NAME=Open WebUI
-      - WEBUI_ALLOW_REGISTRATION=true
-      - WEBUI_SERVE_BASE_PATH=/
-      - WEBUI_CORS_PROXY_ENABLED=true
-      - WEBUI_CORS_PROXY_TIMEOUT=60
-      - WEBUI_SECRET_KEY=${WEBUI_JWT_SECRET_KEY}
-      - WEBUI_DEFAULT_USER=admin
-      - WEBUI_DEFAULT_PASSWORD=admin
-      - WEBUI_ENABLE_SIGNUP=
-      - WEBUI_ENABLE_SOCIAL_LOGIN=false
-    volumes:
-      - ${OPENWEBUI_DATA_PATH}:/app/backend/data  # Gebruikt env variable voor volume path
+    container_name: open-webui
+    networks:
+      - traefik-proxy
+      - ai-net
     deploy:
       mode: replicated
       replicas: 1
@@ -54,8 +37,6 @@ services:
           - node.role == manager
       labels:
         - "traefik.enable=true"
-        # Network configuratie
-        - "traefik.docker.network=traefik_traefik-proxy"
         # Service definitie met expliciete naam
         - "traefik.http.services.open-webui.loadbalancer.server.port=8080"
         - "traefik.http.services.open-webui.loadbalancer.passHostHeader=true"
@@ -70,9 +51,8 @@ services:
         - "traefik.http.routers.open-webui-http.rule=Host(`${OPENWEBUI_DOMAIN}`)"
         - "traefik.http.routers.open-webui-http.entrypoints=web"
         - "traefik.http.routers.open-webui-http.service=open-webui"
-    networks:
-      - ai-net
-      - traefik-proxy  # Verbinding met Traefik netwerk
+    volumes:
+      - ${OPENWEBUI_DATA_PATH}:/app/backend/data  # Gebruikt env variable voor volume path
 
 networks:
   ai-net:
