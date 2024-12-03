@@ -14,7 +14,7 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=traefik_traefik-proxy"
       - "--accesslog=true"
-      - "--log.level=TRACE"
+      - "--log.level=DEBUG"
       - "--certificatesresolvers.default.acme.httpchallenge=true"
       - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.default.acme.email=${TRAEFIK_LETSENCRYPT_MAIL}"
@@ -22,6 +22,7 @@ services:
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+      - "--certificatesresolvers.default.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
     ports:
       - target: ${TRAEFIK_ENTRYPOINT_HTTP}
         published: ${TRAEFIK_ENTRYPOINT_HTTP}

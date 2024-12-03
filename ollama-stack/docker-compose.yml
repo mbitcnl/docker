@@ -53,19 +53,15 @@ services:
         - "traefik.enable=true"
         # Service definitie
         - "traefik.http.services.openwebui-service.loadbalancer.server.port=8080"
-        # Router configuratie
+        # HTTPS router
         - "traefik.http.routers.openwebui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
         - "traefik.http.routers.openwebui.entrypoints=websecure"
-        - "traefik.http.routers.openwebui.tls=true"
-        - "traefik.http.routers.openwebui.tls.certresolver=default"
         - "traefik.http.routers.openwebui.service=openwebui-service"
-        # Expliciete certificaat configuratie
-        - "traefik.http.routers.openwebui.tls.domains[0].main=${OPENWEBUI_DOMAIN}"
-        - "traefik.http.routers.openwebui.tls.domains[0].sans=${OPENWEBUI_DOMAIN}"
-        # HTTP router voor ACME challenge
-        - "traefik.http.routers.openwebui-web.rule=Host(`${OPENWEBUI_DOMAIN}`)"
-        - "traefik.http.routers.openwebui-web.entrypoints=web"
-        - "traefik.http.routers.openwebui-web.service=openwebui-service"
+        - "traefik.http.routers.openwebui.tls.certresolver=default"
+        # HTTP router (voor ACME)
+        - "traefik.http.routers.openwebui-http.rule=Host(`${OPENWEBUI_DOMAIN}`)"
+        - "traefik.http.routers.openwebui-http.entrypoints=web"
+        - "traefik.http.routers.openwebui-http.service=openwebui-service"
     networks:
       - ai-net
       - traefik-proxy  # Verbinding met Traefik netwerk
