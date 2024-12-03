@@ -57,17 +57,14 @@ services:
           - node.role == manager
       labels:
         - "traefik.enable=true"
-        # Basic configuration
-        - "traefik.docker.lbswarm=true"
-        - "traefik.docker.network=traefik_traefik-proxy"
-        # HTTP router
-        - "traefik.http.routers.openwebui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
-        - "traefik.http.routers.openwebui.entrypoints=websecure"
-        - "traefik.http.routers.openwebui.tls=true"
-        - "traefik.http.routers.openwebui.tls.certresolver=default"
         # Service
-        - "traefik.http.services.openwebui.loadbalancer.server.port=8080"
-        - "traefik.http.services.openwebui.loadbalancer.server.scheme=http"
+        - "traefik.http.services.open-webui.loadbalancer.server.port=8080"
+        # Router
+        - "traefik.http.routers.open-webui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
+        - "traefik.http.routers.open-webui.entrypoints=websecure"
+        - "traefik.http.routers.open-webui.service=open-webui"
+        - "traefik.http.routers.open-webui.tls=true"
+        - "traefik.http.routers.open-webui.tls.certresolver=default"
 
 networks:
   ai-net:
