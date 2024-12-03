@@ -60,12 +60,14 @@ services:
         # Service definitie
         - "traefik.http.services.open-webui.loadbalancer.server.port=8080"
         - "traefik.http.services.open-webui.loadbalancer.passHostHeader=true"
-        # HTTPS router
-        - "traefik.http.routers.open-webui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
+        # Router configuratie
         - "traefik.http.routers.open-webui.entrypoints=websecure"
+        - "traefik.http.routers.open-webui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
         - "traefik.http.routers.open-webui.service=open-webui"
         - "traefik.http.routers.open-webui.tls=true"
         - "traefik.http.routers.open-webui.tls.certresolver=default"
+        # Specifieke service naam
+        - "traefik.docker.service=ollama-stack_open-webui"
 
 networks:
   ai-net:
