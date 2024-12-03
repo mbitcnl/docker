@@ -48,7 +48,10 @@ services:
       - ${OPENWEBUI_DATA_PATH}:/app/backend/data  # Gebruikt env variable voor volume path
     deploy:
       mode: replicated
-      replicas: 1  # 3 replicas zoals gevraagd
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager  # of 'manager' afhankelijk van waar je het wilt draaien
       labels:
         - "traefik.enable=true"
         # Service definitie met expliciete naam
