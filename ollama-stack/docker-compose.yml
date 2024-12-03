@@ -25,6 +25,16 @@ services:
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
+    labels:
+      - "traefik.enable=true"
+      # Service & Router configuratie
+      - "traefik.http.routers.openwebui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
+      - "traefik.http.routers.openwebui.service=openwebui-service"
+      - "traefik.http.routers.openwebui.entrypoints=websecure"
+      - "traefik.http.routers.openwebui.tls=true"
+      - "traefik.http.routers.openwebui.tls.certresolver=default"
+      - "traefik.http.services.openwebui-service.loadbalancer.server.port=8080"
+      - "traefik.http.services.openwebui-service.loadbalancer.passHostHeader=true"
     environment:
       - OLLAMA_API_BASE_URL=http://ollama:11434/api
       - WEBUI_JWT_SECRET_KEY=${WEBUI_JWT_SECRET_KEY}
@@ -55,17 +65,6 @@ services:
       placement:
         constraints:
           - node.role == manager
-      labels:
-        - "traefik.enable=true"
-        # Basis configuratie
-        - "traefik.docker.network=traefik-proxy"
-        # Service
-        - "traefik.http.services.open-webui.loadbalancer.server.port=8080"
-        # HTTPS Router
-        - "traefik.http.routers.open-webui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
-        - "traefik.http.routers.open-webui.entrypoints=websecure"
-        - "traefik.http.routers.open-webui.tls=true"
-        - "traefik.http.routers.open-webui.tls.certresolver=default"
 
 networks:
   ai-net:
