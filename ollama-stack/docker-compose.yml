@@ -43,7 +43,8 @@ networks:
   ai-net:
     driver: overlay
   traefik-proxy:
-    external: true    # Gebruikt bestaande Traefik netwerk
+    external: true
+    name: traefik_traefik-proxy
 
 volumes:
   ollama_data:
