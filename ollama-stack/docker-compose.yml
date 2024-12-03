@@ -32,7 +32,20 @@ services:
       - WEBUI_AUTH=true
       - WEBUI_HOST=0.0.0.0
       - WEBUI_PORT=8080
-      # ... andere environment variables ...
+      - WEBUI_DEBUG=false
+      - LOG_LEVEL=info
+      - WEBUI_APP_NAME=Open WebUI
+      - WEBUI_ALLOW_REGISTRATION=true
+      - WEBUI_SERVE_BASE_PATH=/
+      - WEBUI_CORS_PROXY_ENABLED=true
+      - WEBUI_CORS_PROXY_TIMEOUT=60
+      - WEBUI_SECRET_KEY=${WEBUI_JWT_SECRET_KEY}
+      - WEBUI_DEFAULT_USER=admin
+      - WEBUI_DEFAULT_PASSWORD=admin
+      - WEBUI_ENABLE_SIGNUP=
+      - WEBUI_ENABLE_SOCIAL_LOGIN=false
+    volumes:
+      - ${OPENWEBUI_DATA_PATH}:/app/backend/data
     networks:
       - traefik-proxy
       - ai-net
