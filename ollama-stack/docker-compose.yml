@@ -25,7 +25,14 @@ services:
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
-    container_name: open-webui
+    environment:
+      - OLLAMA_API_BASE_URL=http://ollama:11434/api
+      - WEBUI_JWT_SECRET_KEY=${WEBUI_JWT_SECRET_KEY}
+      - WEBUI_DB_PATH=/app/backend/data/database.db
+      - WEBUI_AUTH=true
+      - WEBUI_HOST=0.0.0.0
+      - WEBUI_PORT=8080
+      # ... andere environment variables ...
     networks:
       - traefik-proxy
       - ai-net
@@ -37,22 +44,15 @@ services:
           - node.role == manager
       labels:
         - "traefik.enable=true"
-        # Service definitie met expliciete naam
+        # Service definitie
         - "traefik.http.services.open-webui.loadbalancer.server.port=8080"
         - "traefik.http.services.open-webui.loadbalancer.passHostHeader=true"
-        - "traefik.http.services.open-webui.loadbalancer.sticky.cookie=true"
         # HTTPS router
-        - "traefik.http.routers.open-webui-secure.rule=Host(`${OPENWEBUI_DOMAIN}`)"
-        - "traefik.http.routers.open-webui-secure.entrypoints=websecure"
-        - "traefik.http.routers.open-webui-secure.service=open-webui"
-        - "traefik.http.routers.open-webui-secure.tls=true"
-        - "traefik.http.routers.open-webui-secure.tls.certresolver=default"
-        # HTTP router (voor ACME)
-        - "traefik.http.routers.open-webui-http.rule=Host(`${OPENWEBUI_DOMAIN}`)"
-        - "traefik.http.routers.open-webui-http.entrypoints=web"
-        - "traefik.http.routers.open-webui-http.service=open-webui"
-    volumes:
-      - ${OPENWEBUI_DATA_PATH}:/app/backend/data  # Gebruikt env variable voor volume path
+        - "traefik.http.routers.open-webui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
+        - "traefik.http.routers.open-webui.entrypoints=websecure"
+        - "traefik.http.routers.open-webui.service=open-webui"
+        - "traefik.http.routers.open-webui.tls=true"
+        - "traefik.http.routers.open-webui.tls.certresolver=default"
 
 networks:
   ai-net:
