@@ -56,14 +56,9 @@ services:
         - "traefik.http.routers.openwebui.entrypoints=websecure"
         - "traefik.http.routers.openwebui.tls=true"
         - "traefik.http.routers.openwebui.tls.certresolver=default"
-        - "traefik.http.routers.openwebui.tls.domains[0].main=${OPENWEBUI_DOMAIN}"  # Forceer certificaat aanvraag
+        - "traefik.http.routers.openwebui.tls.domains[0].main=${OPENWEBUI_DOMAIN}"
         # Service configuratie
         - "traefik.http.services.openwebui.loadbalancer.server.port=8080"
-        # HTTP naar HTTPS redirect
-        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-        - "traefik.http.routers.openwebui-http.rule=Host(`${OPENWEBUI_DOMAIN}`)"
-        - "traefik.http.routers.openwebui-http.entrypoints=web"
-        - "traefik.http.routers.openwebui-http.middlewares=redirect-to-https"
     networks:
       - ai-net
       - traefik-proxy  # Verbinding met Traefik netwerk
