@@ -51,12 +51,15 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.role == manager  # of 'manager' afhankelijk van waar je het wilt draaien
+          - node.role == manager
       labels:
         - "traefik.enable=true"
+        # Network configuratie
+        - "traefik.docker.network=traefik_traefik-proxy"
         # Service definitie met expliciete naam
         - "traefik.http.services.open-webui.loadbalancer.server.port=8080"
         - "traefik.http.services.open-webui.loadbalancer.passHostHeader=true"
+        - "traefik.http.services.open-webui.loadbalancer.sticky.cookie=true"
         # HTTPS router
         - "traefik.http.routers.open-webui-secure.rule=Host(`${OPENWEBUI_DOMAIN}`)"
         - "traefik.http.routers.open-webui-secure.entrypoints=websecure"
