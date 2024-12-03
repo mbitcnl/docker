@@ -31,7 +31,7 @@ services:
       - ${OPENWEBUI_DATA_PATH}:/app/backend/data  # Gebruikt env variable voor volume path
     deploy:
       mode: replicated
-      replicas: 3  # 3 replicas zoals gevraagd
+      replicas: 1  # 3 replicas zoals gevraagd
       labels:
         - "traefik.enable=true"
         # Router configuratie
