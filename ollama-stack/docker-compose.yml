@@ -15,7 +15,13 @@ services:
     image: ghcr.io/open-webui/open-webui:main
     environment:
       - OLLAMA_API_BASE_URL=http://ollama:11434/api
-      - WEBUI_JWT_SECRET_KEY=${WEBUI_JWT_SECRET_KEY}  # Zet deze in .env file
+      - WEBUI_JWT_SECRET_KEY=${WEBUI_JWT_SECRET_KEY}
+      - WEBUI_DB_PATH=/app/backend/data/database.db
+      - WEBUI_AUTH=true
+      - WEBUI_HOST=0.0.0.0
+      - WEBUI_PORT=8080
+      - WEBUI_DEBUG=false
+      - LOG_LEVEL=info
     volumes:
       - ${OPENWEBUI_DATA_PATH}:/app/backend/data  # Gebruikt env variable voor volume path
     deploy:
