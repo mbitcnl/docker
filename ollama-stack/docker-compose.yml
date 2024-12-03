@@ -6,6 +6,18 @@ services:
     deploy:
       mode: replicated
       replicas: 1  # Ollama draait als single instance voor model management
+      labels:
+        - "traefik.enable=true"
+        # Router configuratie voor Ollama API
+        - "traefik.http.routers.ollama-api.rule=Host(`${OLLAMA_API_DOMAIN}`)"
+        - "traefik.http.routers.ollama-api.entrypoints=websecure"
+        - "traefik.http.routers.ollama-api.tls=true"
+        - "traefik.http.routers.ollama-api.tls.certresolver=default"
+        # Service configuratie
+        - "traefik.http.services.ollama-api.loadbalancer.server.port=11434"
+        # Optionele beveiliging
+        - "traefik.http.routers.ollama-api.middlewares=ip-allowlist@docker"
+        - "traefik.http.middlewares.ip-allowlist.ipallowlist.sourcerange=${OLLAMA_API_ALLOWED_IPS}"
     networks:
       - ai-net
     volumes:
