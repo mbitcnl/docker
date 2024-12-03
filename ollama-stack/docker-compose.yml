@@ -39,6 +39,11 @@ services:
       - WEBUI_SERVE_BASE_PATH=/
       - WEBUI_CORS_PROXY_ENABLED=true
       - WEBUI_CORS_PROXY_TIMEOUT=60
+      - WEBUI_SECRET_KEY=${WEBUI_JWT_SECRET_KEY}
+      - WEBUI_DEFAULT_USER=admin
+      - WEBUI_DEFAULT_PASSWORD=admin
+      - WEBUI_ENABLE_SIGNUP=
+      - WEBUI_ENABLE_SOCIAL_LOGIN=false
     volumes:
       - ${OPENWEBUI_DATA_PATH}:/app/backend/data  # Gebruikt env variable voor volume path
     deploy:
