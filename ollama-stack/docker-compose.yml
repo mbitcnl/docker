@@ -71,7 +71,7 @@ networks:
     driver: overlay
   traefik-proxy:
     external: true
-    name: traefik_traefik-proxy
+    name: traefik-proxy
 
 volumes:
   ollama_data:
