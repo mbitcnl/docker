@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    deploy:
+      mode: replicated
+      replicas: 1  # Ollama draait als single instance voor model management
+    networks:
+      - ai-net
+    volumes:
+      - ${OLLAMA_DATA_PATH}:/root/.ollama  # Persistent storage voor models
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    environment:
+      - OLLAMA_API_BASE_URL=http://ollama:11434/api
+      - WEBUI_JWT_SECRET_KEY=${WEBUI_JWT_SECRET_KEY}  # Zet deze in .env file
+    volumes:
+      - ${OPENWEBUI_DATA_PATH}:/app/backend/data  # Gebruikt env variable voor volume path
+    deploy:
+      mode: replicated
+      replicas: 3  # 3 replicas zoals gevraagd
+      labels:
+        - "traefik.enable=true"
+        # Router configuratie
+        - "traefik.http.routers.openwebui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
+        - "traefik.http.routers.openwebui.entrypoints=websecure"
+        - "traefik.http.routers.openwebui.tls=true"
+        - "traefik.http.routers.openwebui.tls.certresolver=default"
+        # Service configuratie
+        - "traefik.http.services.openwebui.loadbalancer.server.port=8080"
+        # HTTP naar HTTPS redirect
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+        - "traefik.http.routers.openwebui-http.rule=Host(`${OPENWEBUI_DOMAIN}`)"
+        - "traefik.http.routers.openwebui-http.entrypoints=web"
+        - "traefik.http.routers.openwebui-http.middlewares=redirect-to-https"
+    networks:
+      - ai-net
+      - traefik-proxy  # Verbinding met Traefik netwerk
+
+networks:
+  ai-net:
+    driver: overlay
+  traefik-proxy:
+    external: true    # Gebruikt bestaande Traefik netwerk
+
+volumes:
+  ollama_data:
+    driver: local 
+  open_webui_data:    # Nieuw volume toevoegen
+    driver: local
