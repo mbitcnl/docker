@@ -53,6 +53,12 @@ services:
         - "traefik.enable=true"
         # Service definitie
         - "traefik.http.services.openwebui-service.loadbalancer.server.port=8080"
+        # Router configuratie met SANs voor certificaat
+        - "traefik.http.routers.openwebui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
+        - "traefik.http.routers.openwebui.entrypoints=websecure"
+        - "traefik.http.routers.openwebui.tls=true"
+        - "traefik.http.routers.openwebui.tls.certresolver=default"
+        - "traefik.http.routers.openwebui.tls.domains[0].main=${OPENWEBUI_DOMAIN}"  # Dit forceert de certificaat aanvraag
         # Router configuratie
         - "traefik.http.routers.openwebui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
         - "traefik.http.routers.openwebui.entrypoints=websecure"
