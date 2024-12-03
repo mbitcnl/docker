@@ -51,12 +51,14 @@ services:
       replicas: 1  # 3 replicas zoals gevraagd
       labels:
         - "traefik.enable=true"
+        - "traefik.docker.network=traefik_traefik-proxy"  # Specificeer het netwerk
         # Service definitie
         - "traefik.http.services.openwebui-service.loadbalancer.server.port=8080"
         # HTTPS router
         - "traefik.http.routers.openwebui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
         - "traefik.http.routers.openwebui.entrypoints=websecure"
         - "traefik.http.routers.openwebui.service=openwebui-service"
+        - "traefik.http.routers.openwebui.tls=true"
         - "traefik.http.routers.openwebui.tls.certresolver=default"
         # HTTP router (voor ACME)
         - "traefik.http.routers.openwebui-http.rule=Host(`${OPENWEBUI_DOMAIN}`)"
