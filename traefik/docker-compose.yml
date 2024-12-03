@@ -21,6 +21,8 @@ services:
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+      - "--providers.docker.swarmmode=true"
+      - "--providers.docker.network=traefik_traefik-proxy"
     ports:
       - target: ${TRAEFIK_ENTRYPOINT_HTTP}
         published: ${TRAEFIK_ENTRYPOINT_HTTP}

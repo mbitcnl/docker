@@ -51,18 +51,18 @@ services:
       replicas: 1  # 3 replicas zoals gevraagd
       labels:
         - "traefik.enable=true"
+        # Service definitie
+        - "traefik.http.services.openwebui-service.loadbalancer.server.port=8080"
         # Router configuratie
         - "traefik.http.routers.openwebui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
         - "traefik.http.routers.openwebui.entrypoints=websecure"
         - "traefik.http.routers.openwebui.tls=true"
         - "traefik.http.routers.openwebui.tls.certresolver=default"
-        - "traefik.http.routers.openwebui.tls.domains[0].main=${OPENWEBUI_DOMAIN}"
-        # Service configuratie
-        - "traefik.http.services.openwebui.loadbalancer.server.port=8080"
-        # Voeg een router toe voor HTTP challenge
+        - "traefik.http.routers.openwebui.service=openwebui-service"
+        # HTTP router
         - "traefik.http.routers.openwebui-web.rule=Host(`${OPENWEBUI_DOMAIN}`)"
         - "traefik.http.routers.openwebui-web.entrypoints=web"
-        - "traefik.http.routers.openwebui-web.service=openwebui"
+        - "traefik.http.routers.openwebui-web.service=openwebui-service"
     networks:
       - ai-net
       - traefik-proxy  # Verbinding met Traefik netwerk
