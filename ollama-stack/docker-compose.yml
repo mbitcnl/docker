@@ -59,6 +59,10 @@ services:
         - "traefik.http.routers.openwebui.tls.domains[0].main=${OPENWEBUI_DOMAIN}"
         # Service configuratie
         - "traefik.http.services.openwebui.loadbalancer.server.port=8080"
+        # Voeg een router toe voor HTTP challenge
+        - "traefik.http.routers.openwebui-web.rule=Host(`${OPENWEBUI_DOMAIN}`)"
+        - "traefik.http.routers.openwebui-web.entrypoints=web"
+        - "traefik.http.routers.openwebui-web.service=openwebui"
     networks:
       - ai-net
       - traefik-proxy  # Verbinding met Traefik netwerk
