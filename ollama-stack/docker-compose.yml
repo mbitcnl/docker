@@ -68,6 +68,8 @@ services:
 
 networks:
   ai-net:
+    external: true
+    name: ai-net
     driver: overlay
   traefik-proxy:
     external: true
