@@ -23,6 +23,7 @@ services:
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
       - "--certificatesresolvers.default.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--api.debug=true"
     ports:
       - target: ${TRAEFIK_ENTRYPOINT_HTTP}
         published: ${TRAEFIK_ENTRYPOINT_HTTP}
