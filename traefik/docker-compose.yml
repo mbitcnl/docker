@@ -13,7 +13,7 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=traefik_traefik-proxy"
-      - "--providers.docker.defaultrule=Host(`{{ normalize .Name }}`)"
+      - "--providers.docker.constraints=Label(`traefik.constraint-label`, `traefik-public`)"
       - "--log.level=TRACE"
       - "--certificatesresolvers.default.acme.httpchallenge=true"
       - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web"

@@ -57,9 +57,9 @@ services:
           - node.role == manager
       labels:
         - "traefik.enable=true"
-        # Service
-        - "traefik.http.services.open-webui.loadbalancer.server.port=8080"
-        # Router
+        # Service definitie
+        - "traefik.service.open-webui.loadbalancer.server.port=8080"
+        # Router definitie
         - "traefik.http.routers.open-webui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
         - "traefik.http.routers.open-webui.entrypoints=websecure"
         - "traefik.http.routers.open-webui.service=open-webui"
@@ -67,7 +67,7 @@ services:
         - "traefik.http.routers.open-webui.tls.certresolver=default"
         # Swarm specifiek
         - "traefik.docker.network=traefik_traefik-proxy"
-        - "traefik.docker.service=ollama-stack_open-webui"
+        - "traefik.constraint-label=traefik-public"
 
 networks:
   ai-net:
