@@ -57,14 +57,15 @@ services:
           - node.role == manager
       labels:
         - "traefik.enable=true"
-        # Service definitie (verplicht voor Swarm mode)
-        - "traefik.http.services.openwebui.loadbalancer.server.port=8080"
-        # Router definitie 
-        - "traefik.http.routers.openwebui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
-        - "traefik.http.routers.openwebui.entrypoints=websecure"
-        - "traefik.http.routers.openwebui.service=openwebui"
-        - "traefik.http.routers.openwebui.tls=true"
-        - "traefik.http.routers.openwebui.tls.certresolver=default"
+        # Basis configuratie
+        - "traefik.docker.network=traefik-proxy"
+        # Service
+        - "traefik.http.services.open-webui.loadbalancer.server.port=8080"
+        # HTTPS Router
+        - "traefik.http.routers.open-webui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
+        - "traefik.http.routers.open-webui.entrypoints=websecure"
+        - "traefik.http.routers.open-webui.tls=true"
+        - "traefik.http.routers.open-webui.tls.certresolver=default"
 
 networks:
   ai-net:
