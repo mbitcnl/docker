@@ -51,19 +51,19 @@ services:
       replicas: 1  # 3 replicas zoals gevraagd
       labels:
         - "traefik.enable=true"
-        - "traefik.docker.network=traefik_traefik-proxy"  # Specificeer het netwerk
-        # Service definitie
-        - "traefik.http.services.openwebui-service.loadbalancer.server.port=8080"
+        # Service definitie met expliciete naam
+        - "traefik.http.services.open-webui.loadbalancer.server.port=8080"
+        - "traefik.http.services.open-webui.loadbalancer.passHostHeader=true"
         # HTTPS router
-        - "traefik.http.routers.openwebui.rule=Host(`${OPENWEBUI_DOMAIN}`)"
-        - "traefik.http.routers.openwebui.entrypoints=websecure"
-        - "traefik.http.routers.openwebui.service=openwebui-service"
-        - "traefik.http.routers.openwebui.tls=true"
-        - "traefik.http.routers.openwebui.tls.certresolver=default"
+        - "traefik.http.routers.open-webui-secure.rule=Host(`${OPENWEBUI_DOMAIN}`)"
+        - "traefik.http.routers.open-webui-secure.entrypoints=websecure"
+        - "traefik.http.routers.open-webui-secure.service=open-webui"
+        - "traefik.http.routers.open-webui-secure.tls=true"
+        - "traefik.http.routers.open-webui-secure.tls.certresolver=default"
         # HTTP router (voor ACME)
-        - "traefik.http.routers.openwebui-http.rule=Host(`${OPENWEBUI_DOMAIN}`)"
-        - "traefik.http.routers.openwebui-http.entrypoints=web"
-        - "traefik.http.routers.openwebui-http.service=openwebui-service"
+        - "traefik.http.routers.open-webui-http.rule=Host(`${OPENWEBUI_DOMAIN}`)"
+        - "traefik.http.routers.open-webui-http.entrypoints=web"
+        - "traefik.http.routers.open-webui-http.service=open-webui"
     networks:
       - ai-net
       - traefik-proxy  # Verbinding met Traefik netwerk
