@@ -65,6 +65,9 @@ services:
         - "traefik.http.routers.open-webui.service=open-webui"
         - "traefik.http.routers.open-webui.tls=true"
         - "traefik.http.routers.open-webui.tls.certresolver=default"
+        # Swarm specifiek
+        - "traefik.docker.network=traefik_traefik-proxy"
+        - "traefik.docker.service=ollama-stack_open-webui"
 
 networks:
   ai-net:
