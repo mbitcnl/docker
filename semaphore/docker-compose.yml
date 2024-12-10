@@ -12,6 +12,8 @@ services:
             SEMAPHORE_DATA_PATH: ${SEMAPHORE_DATA_PATH}
             SEMAPHORE_CONFIG_PATH: ${SEMAPHORE_CONFIG_PATH}
             SEMAPHORE_TEMP_PATH: ${SEMAPHORE_TEMP_PATH}
+            PUID: ${PUID}
+            PGID: ${PGID}
         volumes:
             - ${SEMAPHORE_DATA_PATH}:/var/lib/semaphore
             - ${SEMAPHORE_CONFIG_PATH}:/etc/semaphore
