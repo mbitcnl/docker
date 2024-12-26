@@ -8,15 +8,12 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.grav.rule=Host(`www.mbitc.nl`) || Host(`mbitc.nl`)"
-        - "traefik.http.routers.grav.entrypoints=web"
-        - "traefik.http.routers.grav.middlewares=redirect-to-https"
-        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-        - "traefik.http.routers.grav-secure.rule=Host(`www.mbitc.nl`) || Host(`mbitc.nl`)"
-        - "traefik.http.routers.grav-secure.entrypoints=websecure"
-        - "traefik.http.routers.grav-secure.tls=true"
-        - "traefik.http.routers.grav-secure.tls.certresolver=letsencrypt"
-        - "traefik.http.services.grav.loadbalancer.server.port=80"
-        - "traefik.docker.network=traefik-proxy"
+        - "traefik.http.routers.grav.service=grav-service"
+        - "traefik.http.routers.grav.entrypoints=websecure"
+        - "traefik.http.routers.grav.tls=true"
+        - "traefik.http.routers.grav.tls.certresolver=default"
+        - "traefik.http.services.grav-service.loadbalancer.server.port=80"
+        - "traefik.http.services.grav-service.loadbalancer.passHostHeader=true"
     environment:
       - TZ=Europe/Amsterdam
     volumes:
