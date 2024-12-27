@@ -19,7 +19,7 @@ services:
       - MULTISITE=${MULTISITE:-yes}
       - USE_REDIS=${USE_REDIS:-yes}
       - REDIS_HOST=${REDIS_HOST:-bw-redis}
-      - API_WHITELIST_IP=${API_WHITELIST_IP:-127.0.0.0/8 10.0.5.0/24}
+      - API_WHITELIST_IP=${API_WHITELIST_IP:-127.0.0.0/8 172.16.0.0/12 10.0.0.0/8}
     networks:
       - bw-universe
       - bw-services
