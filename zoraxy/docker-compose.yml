@@ -22,6 +22,9 @@ services:
       - FASTGEOIP=true
       - DOCKER=true
       - MDNS=true
+      - DOCKER_CLUSTER=true
+      - NODE_ID={{.Node.ID}}
+      - HOSTNAME={{.Node.Hostname}}
     deploy:
       mode: global
       placement:
