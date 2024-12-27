@@ -19,7 +19,7 @@ services:
       - MULTISITE=${MULTISITE:-yes}
       - USE_REDIS=${USE_REDIS:-yes}
       - REDIS_HOST=${REDIS_HOST:-bw-redis}
-      - API_WHITELIST_IP=${API_WHITELIST_IP:-127.0.0.0/8 10.20.30.0/24}
+      - API_WHITELIST_IP=${API_WHITELIST_IP:-127.0.0.0/8 10.0.5.0/24}
     networks:
       - bw-universe
       - bw-services
@@ -106,17 +106,8 @@ services:
 
 networks:
   bw-universe:
-    name: bw-universe
-    driver: overlay
-    attachable: true
-    ipam:
-      config:
-        - subnet: ${BW_UNIVERSE_SUBNET:-10.20.30.0/24}
+    external: true
   bw-services:
-    name: bw-services
-    driver: overlay
-    attachable: true
+    external: true
   bw-docker:
-    name: bw-docker
-    driver: overlay
-    attachable: true 
+    external: true 
