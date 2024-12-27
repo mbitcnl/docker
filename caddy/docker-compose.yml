@@ -35,6 +35,4 @@ services:
 
 networks:
   caddy-proxy:
-    driver: overlay
-    attachable: true
-    name: caddy-proxy 
+    external: true 
