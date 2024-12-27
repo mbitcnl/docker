@@ -14,11 +14,11 @@ services:
         protocol: tcp
     environment:
       - SERVER_NAME=${SERVER_NAME:-}
-      - DATABASE_URI=mariadb+pymysql://${MYSQL_USER:-bunkerweb}:${MYSQL_PASSWORD}@bw-db:3306/${MYSQL_DATABASE:-db}
-      - SWARM_MODE=yes
-      - MULTISITE=yes
-      - USE_REDIS=yes
-      - REDIS_HOST=bw-redis
+      - DATABASE_URI=mariadb+pymysql://${MYSQL_USER:-bunkerweb}:${MYSQL_PASSWORD}@${MYSQL_HOST:-bw-db}:3306/${MYSQL_DATABASE:-db}
+      - SWARM_MODE=${SWARM_MODE:-yes}
+      - MULTISITE=${MULTISITE:-yes}
+      - USE_REDIS=${USE_REDIS:-yes}
+      - REDIS_HOST=${REDIS_HOST:-bw-redis}
       - API_WHITELIST_IP=${API_WHITELIST_IP:-127.0.0.0/8 10.20.30.0/24}
     networks:
       - bw-universe
@@ -34,9 +34,9 @@ services:
   bw-autoconf:
     image: bunkerity/bunkerweb-autoconf:1.5.12
     environment:
-      - SWARM_MODE=yes
-      - DOCKER_HOST=tcp://bw-docker:2375
-      - DATABASE_URI=mariadb+pymysql://${MYSQL_USER:-bunkerweb}:${MYSQL_PASSWORD}@bw-db:3306/${MYSQL_DATABASE:-db}
+      - SWARM_MODE=${SWARM_MODE:-yes}
+      - DOCKER_HOST=${DOCKER_HOST:-tcp://bw-docker:2375}
+      - DATABASE_URI=mariadb+pymysql://${MYSQL_USER:-bunkerweb}:${MYSQL_PASSWORD}@${MYSQL_HOST:-bw-db}:3306/${MYSQL_DATABASE:-db}
     networks:
       - bw-universe
       - bw-docker
@@ -55,7 +55,7 @@ services:
       - SERVICES=1
       - SWARM=1
       - TASKS=1
-      - LOG_LEVEL=warning
+      - LOG_LEVEL=${LOG_LEVEL:-warning}
     networks:
       - bw-docker
     deploy:
@@ -66,9 +66,9 @@ services:
   bw-scheduler:
     image: bunkerity/bunkerweb-scheduler:1.5.12
     environment:
-      - SWARM_MODE=yes
-      - DOCKER_HOST=tcp://bw-docker:2375
-      - DATABASE_URI=mariadb+pymysql://${MYSQL_USER:-bunkerweb}:${MYSQL_PASSWORD}@bw-db:3306/${MYSQL_DATABASE:-db}
+      - SWARM_MODE=${SWARM_MODE:-yes}
+      - DOCKER_HOST=${DOCKER_HOST:-tcp://bw-docker:2375}
+      - DATABASE_URI=mariadb+pymysql://${MYSQL_USER:-bunkerweb}:${MYSQL_PASSWORD}@${MYSQL_HOST:-bw-db}:3306/${MYSQL_DATABASE:-db}
     networks:
       - bw-universe
       - bw-docker
@@ -85,9 +85,7 @@ services:
       - MYSQL_USER=${MYSQL_USER:-bunkerweb}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
-      - type: volume
-        source: bw-data
-        target: /var/lib/mysql
+      - ${NFS_PATH:-/mnt/nfs}/bunkerweb/mariadb:/var/lib/mysql
     networks:
       - bw-docker
     deploy:
@@ -98,29 +96,13 @@ services:
   bw-redis:
     image: redis:7-alpine
     volumes:
-      - type: volume
-        source: bw-redis
-        target: /data
+      - ${NFS_PATH:-/mnt/nfs}/bunkerweb/redis:/data
     networks:
       - bw-universe
     deploy:
       placement:
         constraints:
           - "node.role == worker"
-
-volumes:
-  bw-data:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_SERVER},nolock,soft,rw
-      device: "${NFS_PATH}/bunkerweb/mariadb"
-  bw-redis:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_SERVER},nolock,soft,rw
-      device: "${NFS_PATH}/bunkerweb/redis"
 
 networks:
   bw-universe:
@@ -129,7 +111,7 @@ networks:
     attachable: true
     ipam:
       config:
-        - subnet: 10.20.30.0/24
+        - subnet: ${BW_UNIVERSE_SUBNET:-10.20.30.0/24}
   bw-services:
     name: bw-services
     driver: overlay
