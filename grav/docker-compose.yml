@@ -6,20 +6,14 @@ services:
     deploy:
       replicas: 1
       labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.grav.rule=Host(`www.mbitc.nl`) || Host(`mbitc.nl`)"
-        - "traefik.http.routers.grav.service=grav-service"
-        - "traefik.http.routers.grav.entrypoints=websecure"
-        - "traefik.http.routers.grav.tls=true"
-        - "traefik.http.routers.grav.tls.certresolver=default"
-        - "traefik.http.services.grav-service.loadbalancer.server.port=80"
-        - "traefik.http.services.grav-service.loadbalancer.passHostHeader=true"
+        caddy: mbitc.nl
+        caddy.reverse_proxy: "{{upstreams 80}}"
     environment:
       - TZ=Europe/Amsterdam
     volumes:
       - /nfs/portainer/grav:/config
     networks:
-      - traefik-proxy
+      - caddy-proxy
     restart: unless-stopped
 
 volumes:
@@ -27,5 +21,5 @@ volumes:
     driver: local
 
 networks:
-  traefik-proxy:
+  caddy-proxy:
     external: true
