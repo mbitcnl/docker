@@ -1,0 +1,35 @@
+version: '3.8'
+
+networks:
+  zoraxy-net:
+    driver: overlay
+    attachable: true
+
+services:
+  zoraxy:
+    image: zoraxydocker/zoraxy:latest
+    networks:
+      - zoraxy-net
+    ports:
+      - "${HTTP_PORT}:80"
+      - "${HTTPS_PORT}:443"
+      - "${ADMIN_PORT}:8000"
+    volumes:
+      - ${CONFIG_PATH}:/opt/zoraxy/config/
+      - ${DOCKER_SOCK}:/var/run/docker.sock:ro
+      - ${LOCALTIME}:/etc/localtime:ro
+    environment:
+      - FASTGEOIP=true
+      - DOCKER=true
+      - MDNS=true
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.platform.os == linux
+      restart_policy:
+        condition: unless-stopped
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first 
