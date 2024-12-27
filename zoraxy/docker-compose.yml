@@ -31,14 +31,24 @@ services:
       - DOCKER_CLUSTER=true
       - NODE_ID={{.Node.ID}}
       - HOSTNAME={{.Node.Hostname}}
+      - DOCKER_SWARM=true
+      - CLUSTER_MODE=active
+      - BIND_INTERFACE=eth0
+      - LOG_LEVEL=debug
     deploy:
       mode: global
       endpoint_mode: dnsrr
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 128M
       placement:
         constraints:
           - node.platform.os == linux
         preferences:
           - spread: node.id
+        max_replicas_per_node: 1
       labels:
         - "swarm.proxy=true"
       restart_policy:
