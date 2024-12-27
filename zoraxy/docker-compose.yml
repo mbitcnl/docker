@@ -11,9 +11,15 @@ services:
     networks:
       - zoraxy-net
     ports:
-      - "${HTTP_PORT}:80"
-      - "${HTTPS_PORT}:443"
-      - "${ADMIN_PORT}:8000"
+      - target: 80
+        published: ${HTTP_PORT}
+        mode: host
+      - target: 443
+        published: ${HTTPS_PORT}
+        mode: host
+      - target: 8000
+        published: ${ADMIN_PORT}
+        mode: host
     volumes:
       - ${CONFIG_PATH}:/opt/zoraxy/config/
       - ${DOCKER_SOCK}:/var/run/docker.sock:ro
@@ -27,9 +33,14 @@ services:
       - HOSTNAME={{.Node.Hostname}}
     deploy:
       mode: global
+      endpoint_mode: dnsrr
       placement:
         constraints:
           - node.platform.os == linux
+        preferences:
+          - spread: node.id
+      labels:
+        - "swarm.proxy=true"
       restart_policy:
         condition: any
       update_config:
