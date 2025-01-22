@@ -4,9 +4,9 @@ networks:
   gitea-intern:
     driver: overlay
     internal: true
-  proxy-network:
+  caddy-proxy:
     external: true
-    name: caddy-network
+    name: caddy-proxy
 
 services:
   server:
@@ -25,7 +25,7 @@ services:
       - GITEA__server__ROOT_URL=${DNS_NAME}
     networks:
       - gitea-intern
-      - proxy-network
+      - caddy-proxy
     volumes:
       - ${GITEA_DATA_PATH}:/data
       - /etc/timezone:/etc/timezone:ro
