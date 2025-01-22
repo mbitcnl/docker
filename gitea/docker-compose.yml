@@ -42,9 +42,8 @@ services:
       restart_policy:
         condition: on-failure
       labels:
-        - "caddy.enable=true"
-        - "caddy.servers.name=${DNS_NAME}"
-        - "caddy.servers.reverse_proxy={{upstreams 3000}}"
+        - "caddy=${DNS_NAME}"
+        - "caddy.reverse_proxy={{upstreams 3000}}"
 
   db:
     image: docker.io/library/postgres:14
