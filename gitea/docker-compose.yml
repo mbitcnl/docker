@@ -3,7 +3,7 @@ version: '3.8'
 networks:
   gitea-intern:
     driver: overlay
-    internal: true
+    external: true
   caddy-proxy:
     external: true
     name: caddy-proxy
