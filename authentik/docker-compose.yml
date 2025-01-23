@@ -51,6 +51,8 @@ services:
       AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
       AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
     volumes:
       - ${AUTHENTIK_BIND_MEDIA:-./data/media}:/media
       - ${AUTHENTIK_BIND_TEMPLATES:-./data/templates}:/templates
@@ -76,6 +78,8 @@ services:
       AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
       AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
       AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
     # `user: root` and the docker socket volume are optional.
     # See more for the docker socket integration here:
     # https://goauthentik.io/docs/outposts/integrations/docker
