@@ -39,6 +39,8 @@ services:
       placement:
         constraints:
           - node.role == manager
+      restart_policy:
+        condition: any
       labels:
         - "caddy=${DNS_NAME}"
         - "caddy.reverse_proxy={{upstreams 9000}}"
@@ -59,18 +61,15 @@ services:
     ports:
       - "${COMPOSE_PORT_HTTP:-9000}:9000"
       - "${COMPOSE_PORT_HTTPS:-9443}:9443"
-    depends_on:
-      postgresql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
     networks:
       - authentik-intern
       - caddy-proxy
       - authentik-app-proxy
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.12.2}
-    restart: unless-stopped
+    deploy:
+      restart_policy:
+        condition: any
     command: worker
     environment:
       AUTHENTIK_REDIS__HOST: redis
@@ -92,11 +91,6 @@ services:
       - ${AUTHENTIK_BIND_MEDIA:-./data/media}:/media
       - ${AUTHENTIK_BIND_CERTS:-./data/certs}:/certs
       - ${AUTHENTIK_BIND_TEMPLATES:-./data/templates}:/templates
-    depends_on:
-      postgresql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
     networks:
       - authentik-intern
 
