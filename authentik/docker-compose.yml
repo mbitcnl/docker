@@ -42,8 +42,13 @@ services:
       restart_policy:
         condition: any
       labels:
+        # Basis Caddy config
         - "caddy=${DNS_NAME}"
         - "caddy.reverse_proxy={{upstreams 9000}}"
+        # Outpost configuratie
+        - "caddy.route=/outpost.goauthentik.io/*"
+        - "caddy.route.reverse_proxy={{upstreams 9000}}"
+        - "caddy.route.reverse_proxy.header_up.Host={http.reverse_proxy.upstream.hostport}"
     command: server
     environment:
       AUTHENTIK_REDIS__HOST: redis
