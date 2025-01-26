@@ -48,7 +48,7 @@ services:
         # Outpost configuratie
         - "caddy.route=/outpost.goauthentik.io/*"
         - "caddy.route.reverse_proxy={{upstreams 9000}}"
-        - "caddy.route.reverse_proxy.header_up.Host={http.reverse_proxy.upstream.hostport}"
+        - "caddy.route.reverse_proxy.header_up=Host {http.reverse_proxy.upstream.hostport}"
     command: server
     environment:
       AUTHENTIK_REDIS__HOST: redis
