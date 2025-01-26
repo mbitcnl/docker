@@ -49,6 +49,10 @@ services:
         - "caddy.route=/outpost.goauthentik.io/*"
         - "caddy.route.reverse_proxy={{upstreams 9000}}"
         - "caddy.route.reverse_proxy.header_up=Host {http.reverse_proxy.upstream.hostport}"
+        # Extra headers voor debugging
+        - "caddy.route.reverse_proxy.header_up=X-Original-URL {http.request.scheme}://{http.request.host}{http.request.uri}"
+        - "caddy.route.reverse_proxy.header_up=X-Forwarded-Proto {http.request.scheme}"
+        - "caddy.route.reverse_proxy.header_up=X-Forwarded-Host {http.request.host}"
     command: server
     environment:
       AUTHENTIK_REDIS__HOST: redis
