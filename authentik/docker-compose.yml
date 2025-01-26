@@ -55,9 +55,8 @@ services:
         - "caddy.route.reverse_proxy.header_up=X-Real-IP {http.request.remote.host}"
         - "caddy.route.reverse_proxy.header_up=Upgrade {http.request.header.Upgrade}"
         - "caddy.route.reverse_proxy.header_up=Connection {http.request.header.Connection}"
-        # WebSocket matcher en handler
-        - "caddy.route.handle=@websocket header Connection *Upgrade*"
-        - "caddy.route.handle.reverse_proxy={{upstreams 9000}}"
+        # Automatische WebSocket ondersteuning
+        - "caddy.route.reverse_proxy.websocket"
     command: server
     environment:
       AUTHENTIK_REDIS__HOST: redis
