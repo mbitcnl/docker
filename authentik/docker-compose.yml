@@ -45,7 +45,7 @@ services:
         # Basis Caddy config
         - "caddy=${DNS_NAME}"
         - "caddy.reverse_proxy={{upstreams 9000}}"
-        # Outpost configuratie
+        # Outpost configuratie met headers
         - "caddy.route=/outpost.goauthentik.io/*"
         - "caddy.route.reverse_proxy={{upstreams 9000}}"
         # Vereiste headers voor Authentik
@@ -53,13 +53,10 @@ services:
         - "caddy.route.reverse_proxy.header_up=X-Forwarded-Proto {http.request.scheme}"
         - "caddy.route.reverse_proxy.header_up=X-Forwarded-For {http.request.remote.host}"
         - "caddy.route.reverse_proxy.header_up=X-Real-IP {http.request.remote.host}"
-        # WebSocket support
-        - "caddy.route.reverse_proxy.header_up=Connection {http.request.header.Connection}"
         - "caddy.route.reverse_proxy.header_up=Upgrade {http.request.header.Upgrade}"
-        # Transport configuratie
-        - "caddy.reverse_proxy.transport.protocol=http"
-        # WebSocket support in transport
-        - "caddy.reverse_proxy.transport.websocket=true"
+        - "caddy.route.reverse_proxy.header_up=Connection {http.request.header.Connection}"
+        # WebSocket support via handler
+        - "caddy.route.reverse_proxy.handle_response=upgrade"
     command: server
     environment:
       AUTHENTIK_REDIS__HOST: redis
