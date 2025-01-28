@@ -19,6 +19,10 @@ services:
       - caddy-proxy
     deploy:
       mode: global
+      placement:
+        constraints:
+          - node.role == manager
+          - node.labels.caddy-leader == true
       update_config:
         parallelism: 1
         delay: 10s
