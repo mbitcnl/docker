@@ -72,7 +72,8 @@ services:
 
 networks:
   gitlab-network:
-    driver: overlay
-    attachable: true
+    external: true
+    name: gitlab-network
   caddy-proxy:
     external: true
+    name: caddy-proxy
