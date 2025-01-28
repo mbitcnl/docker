@@ -51,7 +51,12 @@ services:
         gitlab_rails['db_username']='gitlab';
         gitlab_rails['db_password']='${POSTGRES_PASSWORD}';
         gitlab_rails['redis_host']='redis';
-        nginx['enable']=false
+        nginx['listen_addresses']=['0.0.0.0'];
+        nginx['listen_port']=80;
+        nginx['listen_https']=false;
+        nginx['proxy_set_headers']={'X-Forwarded-Proto'=>'https','X-Forwarded-Ssl'=>'on','Host'=>'$$http_host'};
+        gitlab_workhorse['listen_network']='tcp';
+        gitlab_workhorse['listen_addr']='0.0.0.0:8181'
     volumes:
       - ${GITLAB_CONFIG_PATH}:/etc/gitlab
       - ${GITLAB_LOGS_PATH}:/var/log/gitlab
