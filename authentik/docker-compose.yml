@@ -56,6 +56,12 @@ services:
         - "caddy.route.reverse_proxy.header_up=Connection {http.request.header.Connection}"
         - "caddy.route.reverse_proxy.header_up=Upgrade {http.request.header.Upgrade}"
     command: server
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     environment:
       AUTHENTIK_REDIS__HOST: redis
       AUTHENTIK_POSTGRESQL__HOST: postgresql
@@ -78,10 +84,15 @@ services:
       - authentik-app-proxy
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.12.2}
-    deploy:
-      restart_policy:
-        condition: any
-    command: worker
+    command: sh -c "sleep 10 && /authentik/worker.sh"
+    depends_on:
+      server:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+    restart: on-failure:5
     environment:
       AUTHENTIK_REDIS__HOST: redis
       AUTHENTIK_POSTGRESQL__HOST: postgresql
