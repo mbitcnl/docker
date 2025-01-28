@@ -41,27 +41,27 @@ services:
           - node.role == manager
       restart_policy:
         condition: any
-      labels:
-        # Basis Caddy config
-        - "caddy=${DNS_NAME}"
-        - "caddy.reverse_proxy={{upstreams 9000}}"
-        # Outpost configuratie met headers
-        - "caddy.route=/outpost.goauthentik.io/*"
-        - "caddy.route.reverse_proxy={{upstreams 9000}}"
-        # Vereiste headers voor Authentik
-        - "caddy.route.reverse_proxy.header_up=Host {http.request.host}"
-        - "caddy.route.reverse_proxy.header_up=X-Forwarded-Proto {http.request.scheme}"
-        - "caddy.route.reverse_proxy.header_up=X-Forwarded-For {http.request.remote.host}"
-        - "caddy.route.reverse_proxy.header_up=X-Real-IP {http.request.remote.host}"
-        - "caddy.route.reverse_proxy.header_up=Connection {http.request.header.Connection}"
-        - "caddy.route.reverse_proxy.header_up=Upgrade {http.request.header.Upgrade}"
-    command: server
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/health/"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 20s
+      retries: 10
+      start_period: 30s
+    # Basis Caddy config
+    labels:
+      - "caddy=${DNS_NAME}"
+      - "caddy.reverse_proxy={{upstreams 9000}}"
+    # Outpost configuratie met headers
+      - "caddy.route=/outpost.goauthentik.io/*"
+      - "caddy.route.reverse_proxy={{upstreams 9000}}"
+    # Vereiste headers voor Authentik
+      - "caddy.route.reverse_proxy.header_up=Host {http.request.host}"
+      - "caddy.route.reverse_proxy.header_up=X-Forwarded-Proto {http.request.scheme}"
+      - "caddy.route.reverse_proxy.header_up=X-Forwarded-For {http.request.remote.host}"
+      - "caddy.route.reverse_proxy.header_up=X-Real-IP {http.request.remote.host}"
+      - "caddy.route.reverse_proxy.header_up=Connection {http.request.header.Connection}"
+      - "caddy.route.reverse_proxy.header_up=Upgrade {http.request.header.Upgrade}"
+    command: server
     environment:
       AUTHENTIK_REDIS__HOST: redis
       AUTHENTIK_POSTGRESQL__HOST: postgresql
@@ -84,12 +84,24 @@ services:
       - authentik-app-proxy
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.12.2}
-    command: sh -c "sleep 10 && /authentik/worker.sh"
-    depends_on:
-      - server
-      - redis
-      - postgresql
-    restart: on-failure:5
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      update_config:
+        order: start-first
+      placement:
+        constraints:
+          - node.role == manager
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for server to be ready...' &&
+      while ! wget -q --spider http://server:9000/health/; do
+        echo 'Server is unavailable - sleeping' &&
+        sleep 5;
+      done &&
+      echo 'Server is up - starting worker' &&
+      /authentik/worker.sh"
     environment:
       AUTHENTIK_REDIS__HOST: redis
       AUTHENTIK_POSTGRESQL__HOST: postgresql
