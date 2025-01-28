@@ -86,12 +86,9 @@ services:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.12.2}
     command: sh -c "sleep 10 && /authentik/worker.sh"
     depends_on:
-      server:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      postgresql:
-        condition: service_healthy
+      - server
+      - redis
+      - postgresql
     restart: on-failure:5
     environment:
       AUTHENTIK_REDIS__HOST: redis
