@@ -77,3 +77,4 @@ networks:
   caddy-proxy:
     external: true
     name: caddy-proxy
+    driver: overlay
