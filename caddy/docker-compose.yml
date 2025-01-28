@@ -11,18 +11,19 @@ services:
       - CADDY_DOCKER_PROCESS_CADDYFILE=true
       - CADDY_DOCKER_PROXY_SERVICE_TASKS=true
       - CADDY_INGRESS_NETWORKS=caddy-proxy
+      - CADDY_CLUSTERING=consul://consul:8500
     volumes:
       - ${CADDY_DATA_VOLUME:-/mnt/nfs/caddy/data}:/data
       - ${CADDY_CONFIG_VOLUME:-/mnt/nfs/caddy/config}:/config
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - caddy-proxy
+      - consul-net
     deploy:
       mode: global
       placement:
         constraints:
           - node.role == manager
-          - node.labels.caddy-leader == true
       update_config:
         parallelism: 1
         delay: 10s
@@ -35,4 +36,6 @@ services:
 
 networks:
   caddy-proxy:
+    external: true
+  consul-net:
     external: true
