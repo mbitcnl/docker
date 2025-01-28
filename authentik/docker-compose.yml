@@ -46,6 +46,17 @@ services:
       - "caddy=${DNS_NAME}"
       # Reverse proxy configuratie
       - "caddy.reverse_proxy={{upstreams 9000}}"
+      
+      # Vereiste headers voor Authentik
+      - "caddy.reverse_proxy.header_up=X-Forwarded-Proto {http.request.scheme}"
+      - "caddy.reverse_proxy.header_up=X-Forwarded-For {http.request.remote.host}"
+      - "caddy.reverse_proxy.header_up=Host {http.request.host}"
+      - "caddy.reverse_proxy.header_up=Connection {http.request.header.Connection}"
+      - "caddy.reverse_proxy.header_up=Upgrade {http.request.header.Upgrade}"
+      
+      # WebSocket support
+      - "caddy.reverse_proxy.transport.protocol=http"
+      - "caddy.reverse_proxy.transport.versions=1.1 2"
     command: server
     environment:
       AUTHENTIK_REDIS__HOST: redis
