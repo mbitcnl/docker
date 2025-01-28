@@ -78,7 +78,7 @@ services:
       - authentik-app-proxy
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.12.2}
-    command: ["authentik", "worker"]
+    command: worker
     deploy:
       replicas: 1
       restart_policy:
