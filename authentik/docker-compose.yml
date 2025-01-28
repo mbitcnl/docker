@@ -44,26 +44,8 @@ services:
     # Basis Caddy config
     labels:
       - "caddy=${DNS_NAME}"
-      - "caddy.tls.protocols=tls1.2 tls1.3"
-      
       # Reverse proxy configuratie
       - "caddy.reverse_proxy={{upstreams 9000}}"
-      - "caddy.reverse_proxy.transport.tls.insecure_skip_verify=true"
-      - "caddy.reverse_proxy.header_up=X-Forwarded-Proto {http.request.scheme}"
-      - "caddy.reverse_proxy.header_up=X-Forwarded-For {http.request.remote.host}"
-      - "caddy.reverse_proxy.header_up=X-Real-IP {http.request.remote.host}"
-      - "caddy.reverse_proxy.header_up=Host {http.request.host}"
-      
-      # Security headers
-      - "caddy.header=Strict-Transport-Security \"max-age=31536000; includeSubDomains; preload\""
-      - "caddy.header=X-Content-Type-Options \"nosniff\""
-      - "caddy.header=X-Frame-Options \"DENY\""
-      - "caddy.header=Referrer-Policy \"strict-origin-when-cross-origin\""
-      
-      # Debug logging
-      - "caddy.log=format json"
-      - "caddy.log=level DEBUG"
-      - "caddy.log.output=file /var/log/caddy/auth.mbitc.nl.log"
     command: server
     environment:
       AUTHENTIK_REDIS__HOST: redis
