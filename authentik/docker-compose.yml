@@ -42,11 +42,11 @@ services:
       restart_policy:
         condition: any
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/health/"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
+      test: ["CMD", "curl", "-f", "http://localhost:9000/-/health/live/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     # Basis Caddy config
     labels:
       - "caddy=${DNS_NAME}"
@@ -84,19 +84,10 @@ services:
       - authentik-app-proxy
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.12.2}
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
-      update_config:
-        order: start-first
-      placement:
-        constraints:
-          - node.role == manager
-    entrypoint: >
+    command: >
       /bin/sh -c "
       echo 'Waiting for server to be ready...' &&
-      while ! wget -q --spider http://server:9000/health/; do
+      while ! wget -q --spider http://server:9000/-/health/live/; do
         echo 'Server is unavailable - sleeping' &&
         sleep 5;
       done &&
