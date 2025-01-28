@@ -78,32 +78,19 @@ services:
       - authentik-app-proxy
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.12.2}
+    entrypoint: []  # Override de default entrypoint
     command: >
-      manage.py shell -c "
-      import time, socket, sys;
-      
-      def wait_for_port(host, port, timeout=300):
-          start_time = time.time();
-          while True:
-              try:
-                  socket.create_connection((host, port), timeout=1);
-                  return True;
-              except socket.error:
-                  if time.time() - start_time >= timeout:
-                      return False;
-                  time.sleep(2);
-      
-      print('Waiting for PostgreSQL...');
-      if not wait_for_port('postgresql', 5432):
-          sys.exit(1);
-      
-      print('Waiting for Redis...');
-      if not wait_for_port('redis', 6379):
-          sys.exit(1);
-      
-      print('Dependencies ready - starting worker');
-      import os;
-      os.execv('/authentik/worker.sh', ['/authentik/worker.sh']);"
+      /bin/bash -c "
+      echo 'Waiting for PostgreSQL...' &&
+      until nc -z postgresql 5432; do
+        sleep 2;
+      done &&
+      echo 'Waiting for Redis...' &&
+      until nc -z redis 6379; do
+        sleep 2;
+      done &&
+      echo 'Dependencies ready - starting worker' &&
+      /authentik/worker.sh"
     deploy:
       replicas: 1
       restart_policy:
