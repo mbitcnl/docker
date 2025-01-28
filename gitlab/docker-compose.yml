@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  postgresql:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=gitlab
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=gitlabhq_production
+    volumes:
+      - ${POSTGRES_DATA_PATH}:/var/lib/postgresql/data
+    networks:
+      - gitlab-network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gitlab -d gitlabhq_production"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - ${REDIS_DATA_PATH}:/data
+    networks:
+      - gitlab-network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  gitaly:
+    image: gitlab/gitaly:latest
+    volumes:
+      - ${GITALY_DATA_PATH}:/var/opt/gitlab/gitaly
+    networks:
+      - gitlab-network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    environment:
+      - GITLAB_ROOT_PASSWORD=${GITLAB_ROOT_PASSWORD}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - GITLAB_OMNIBUS_CONFIG=external_url '${GITLAB_EXTERNAL_URL}';gitlab_rails['db_adapter']='postgresql';gitlab_rails['db_host']='postgresql';gitlab_rails['db_database']='gitlabhq_production';gitlab_rails['db_username']='gitlab';gitlab_rails['redis_host']='redis';gitaly['configuration']={'storage':[{'name':'default','path':'/var/opt/gitlab/git-data/repositories'}]};nginx['enable']=false
+    volumes:
+      - ${GITLAB_CONFIG_PATH}:/etc/gitlab
+      - ${GITLAB_LOGS_PATH}:/var/log/gitlab
+      - ${GITLAB_DATA_PATH}:/var/opt/gitlab
+      - ${WAIT_SCRIPT_PATH}:/wait-for.sh
+    networks:
+      - gitlab-network
+      - caddy-proxy
+    labels:
+      caddy: ${GITLAB_EXTERNAL_URL}
+      caddy.reverse_proxy: "{{upstreams 80}}"
+    entrypoint: /bin/sh -c "/wait-for.sh postgresql:5432 -- /wait-for.sh redis:6379 -- /assets/wrapper"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+networks:
+  gitlab-network:
+    external: true
+  caddy-proxy:
+    external: true
