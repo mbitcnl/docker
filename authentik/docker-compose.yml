@@ -78,19 +78,7 @@ services:
       - authentik-app-proxy
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.12.2}
-    entrypoint: []  # Override de default entrypoint
-    command: >
-      /bin/bash -c "
-      echo 'Waiting for PostgreSQL...' &&
-      until nc -z postgresql 5432; do
-        sleep 2;
-      done &&
-      echo 'Waiting for Redis...' &&
-      until nc -z redis 6379; do
-        sleep 2;
-      done &&
-      echo 'Dependencies ready - starting worker' &&
-      /authentik/worker.sh"
+    command: ["authentik", "worker"]
     deploy:
       replicas: 1
       restart_policy:
