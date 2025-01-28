@@ -60,7 +60,7 @@ services:
       - gitlab-network
       - caddy-proxy
     labels:
-      caddy: ${GITLAB_EXTERNAL_URL}
+      caddy: ${GITLAB_DOMAIN}
       caddy.reverse_proxy: "{{upstreams 80}}"
     depends_on:
       - postgresql
