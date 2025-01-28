@@ -41,12 +41,6 @@ services:
           - node.role == manager
       restart_policy:
         condition: any
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/-/health/live/"]
-      interval: 60s
-      timeout: 30s
-      retries: 10
-      start_period: 320s
     # Basis Caddy config
     labels:
       - "caddy=${DNS_NAME}"
@@ -84,15 +78,6 @@ services:
       - authentik-app-proxy
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.12.2}
-    command: >
-      /bin/sh -c "
-      echo 'Waiting for server to be ready...' &&
-      while ! wget -q --spider http://server:9000/-/health/live/; do
-        echo 'Server is unavailable - sleeping' &&
-        sleep 5;
-      done &&
-      echo 'Server is up - starting worker' &&
-      /authentik/worker.sh"
     environment:
       AUTHENTIK_REDIS__HOST: redis
       AUTHENTIK_POSTGRESQL__HOST: postgresql
