@@ -78,6 +78,25 @@ services:
       - authentik-app-proxy
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.12.2}
+    command: >
+      /bin/sh -c "
+      echo 'Waiting for PostgreSQL...' &&
+      while ! pg_isready -h postgresql -U ${PG_USER:-authentik}; do
+        sleep 2
+      done &&
+      echo 'Waiting for Redis...' &&
+      while ! redis-cli -h redis ping; do
+        sleep 2
+      done &&
+      echo 'All services ready - starting worker' &&
+      /authentik/worker.sh"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 10s
+      update_config:
+        order: start-first
     environment:
       AUTHENTIK_REDIS__HOST: redis
       AUTHENTIK_POSTGRESQL__HOST: postgresql
