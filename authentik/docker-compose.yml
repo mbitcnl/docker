@@ -79,7 +79,7 @@ services:
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.12.2}
     command: >
-      python3 -c "
+      manage.py shell -c "
       import time, socket, sys;
       
       def wait_for_port(host, port, timeout=300):
