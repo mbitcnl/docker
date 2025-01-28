@@ -41,7 +41,6 @@ services:
 
   gitlab:
     image: gitlab/gitlab-ce:latest
-    user: ${PUID}:${PGID}
     environment:
       - GITLAB_ROOT_PASSWORD=${GITLAB_ROOT_PASSWORD}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
