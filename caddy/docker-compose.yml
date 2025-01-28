@@ -12,6 +12,8 @@ services:
       - CADDY_DOCKER_PROXY_SERVICE_TASKS=true
       - CADDY_INGRESS_NETWORKS=caddy-proxy
       - CADDY_CLUSTERING=consul://consul:8500
+      - CADDY_CERT_SYNC_INTERVAL=10
+      - CADDY_CERT_SYNC_TIMEOUT=30s
     volumes:
       - ${CADDY_DATA_VOLUME:-/mnt/nfs/caddy/data}:/data
       - ${CADDY_CONFIG_VOLUME:-/mnt/nfs/caddy/config}:/config
