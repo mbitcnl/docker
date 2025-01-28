@@ -58,14 +58,12 @@ services:
       - ${GITLAB_CONFIG_PATH}:/etc/gitlab
       - ${GITLAB_LOGS_PATH}:/var/log/gitlab
       - ${GITLAB_DATA_PATH}:/var/opt/gitlab
-      - ${WAIT_SCRIPT_PATH}:/wait-for.sh
     networks:
       - gitlab-network
       - caddy-proxy
     labels:
       caddy: ${GITLAB_EXTERNAL_URL}
       caddy.reverse_proxy: "{{upstreams 80}}"
-    entrypoint: /bin/sh -c "/wait-for.sh postgresql:5432 -- /wait-for.sh redis:6379 -- /assets/wrapper"
     deploy:
       replicas: 1
       restart_policy:
