@@ -6,45 +6,33 @@ services:
   traefik:
     image: traefik:v2.10
     command:
-      - "--api.dashboard=true"
-      - "--providers.docker=true"
       - "--providers.docker.swarmMode=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=traefik-proxy"
-      # Entrypoints
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.websecure.address=:443"
-      # ACME configuratie met staging
-      - "--certificatesresolvers.default.acme.email=${TRAEFIK_LETSENCRYPT_MAIL}"
-      - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
       - "--certificatesresolvers.default.acme.httpchallenge=true"
       - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.default.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-      # Logging
-      - "--log.level=DEBUG"
-      - "--accesslog=true"
-
+      - "--certificatesresolvers.default.acme.email=${TRAEFIK_LETSENCRYPT_MAIL}"
+      - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
     ports:
-      - published: 80
-        target: 80
+      - target: 80
+        published: 80
         mode: ingress
-        protocol: tcp
-      - published: 443
-        target: 443
+      - target: 443
+        published: 443
         mode: ingress
-        protocol: tcp
-      - published: 8080
-        target: 8080
+      - target: 8080
+        published: 8080
         mode: ingress
-        protocol: tcp
-
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${STORAGE_LOCATION}/letsencrypt:/letsencrypt
 
     networks:
       - traefik-proxy
-
     deploy:
       mode: replicated
       replicas: 3
@@ -53,28 +41,13 @@ services:
           - node.role == manager
       labels:
         - "traefik.enable=true"
-        
-        # ACME HTTP Challenge Router
-        - "traefik.http.routers.acme-http.entrypoints=web"
-        - "traefik.http.routers.acme-http.rule=Host(`${TRAEFIK_DASHBOARD_URL}`) && PathPrefix(`/.well-known/acme-challenge/`)"
-        - "traefik.http.routers.acme-http.service=api@internal"
-        - "traefik.http.routers.acme-http.priority=999"
-        - "traefik.http.routers.acme-http.tls=false"
-        
-        # Dashboard configuratie
         - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
         - "traefik.http.routers.dashboard.service=api@internal"
         - "traefik.http.routers.dashboard.entrypoints=websecure"
-        - "traefik.http.routers.dashboard.middlewares=dashboard-auth,dashboard-ipallowlist"
-        - "traefik.http.routers.dashboard.tls=true"
         - "traefik.http.routers.dashboard.tls.certresolver=default"
-        - "traefik.http.routers.dashboard.priority=1"
-        
-        # Middlewares
-        - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}"
-        - "traefik.http.middlewares.dashboard-ipallowlist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
-        - "traefik.http.services.traefik-service.loadbalancer.server.port=8080"
-        - "traefik.http.routers.traefik.service=traefik-service"
+        - "traefik.http.routers.dashboard.middlewares=dashboard-auth,dashboard-ipwhitelist"
+        - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
+        - "traefik.http.middlewares.dashboard-ipwhitelist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
 
 networks:
   traefik-proxy:
