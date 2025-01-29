@@ -14,11 +14,12 @@ services:
       # Entrypoints
       - "--entrypoints.web.address=:${TRAEFIK_ENTRYPOINT_HTTP}"
       - "--entrypoints.websecure.address=:${TRAEFIK_ENTRYPOINT_HTTPS}"
-      # ACME configuratie
+      # ACME configuratie met staging
       - "--certificatesresolvers.default.acme.email=${TRAEFIK_LETSENCRYPT_MAIL}"
       - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
       - "--certificatesresolvers.default.acme.httpchallenge=true"
       - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.default.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       # Logging
       - "--log.level=DEBUG"
       - "--accesslog=true"
