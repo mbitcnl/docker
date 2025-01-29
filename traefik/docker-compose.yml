@@ -27,7 +27,7 @@ services:
         mode: host
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "/nfs/portainer/letsencrypt:/letsencrypt"
+      - "/nfs/portainer/traefik/letsencrypt:/letsencrypt"
     deploy:
       mode: global
       placement:
