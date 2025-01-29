@@ -8,16 +8,14 @@ services:
       - "443:443"
       - "443:443/udp"
     environment:
-      - CADDY_DOCKER_PROCESS_CADDYFILE=true
-      - CADDY_DOCKER_PROXY_SERVICE_TASKS=true
-      - CADDY_INGRESS_NETWORKS=caddy-proxy
       - CADDY_CLUSTERING=consul://consul:8500
-      - CADDY_CERT_SYNC_INTERVAL=10
-      - CADDY_CERT_SYNC_TIMEOUT=30s
+      - CADDY_INGRESS_NETWORKS=caddy-proxy
+      - CADDY_DOCKER_PROXY_SERVICE_TASKS=true
+      - CADDY_DOCKER_PROCESS_CADDYFILE=true
     volumes:
-      - ${CADDY_DATA_VOLUME:-/mnt/nfs/caddy/data}:/data
-      - ${CADDY_CONFIG_VOLUME:-/mnt/nfs/caddy/config}:/config
       - /var/run/docker.sock:/var/run/docker.sock
+      - /nfs/portainer/caddy/data:/data
+      - /nfs/portainer/caddy/config:/config
     networks:
       - caddy-proxy
       - consul-net
@@ -35,6 +33,17 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:80"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
 networks:
   caddy-proxy:
