@@ -8,20 +8,16 @@ services:
     command:
       - "--api=true"
       - "--api.dashboard=true"
-      - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=traefik-proxy"
       - "--entrypoints.web.address=:${TRAEFIK_ENTRYPOINT_HTTP}"
       - "--entrypoints.websecure.address=:${TRAEFIK_ENTRYPOINT_HTTPS}"
-      - "--log.level=INFO"
-      - "--accesslog=true"
       - "--certificatesresolvers.default.acme.email=${TRAEFIK_LETSENCRYPT_MAIL}"
       - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
       - "--certificatesresolvers.default.acme.httpchallenge=true"
       - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web"
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--log.level=DEBUG"
     ports:
       - target: ${TRAEFIK_ENTRYPOINT_HTTP}
         published: ${TRAEFIK_ENTRYPOINT_HTTP}
@@ -71,15 +67,16 @@ services:
       - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.routers.dashboard.middlewares=dashboard-auth,dashboard-ipwhitelist"
+      - "traefik.http.routers.dashboard.middlewares=dashboard-auth,dashboard-ipallowlist"
       - "traefik.http.routers.dashboard.tls=true"
       - "traefik.http.routers.dashboard.tls.certresolver=default"
-      - "traefik.http.middlewares.dashboard-ipwhitelist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
+      - "traefik.http.middlewares.dashboard-ipallowlist.ipallowlist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
       - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
-      - "traefik.http.routers.acme.rule=PathPrefix(`/.well-known/acme-challenge/`)"
-      - "traefik.http.routers.acme.entrypoints=web"
-      - "traefik.http.routers.acme.service=acme-service"
-      - "traefik.http.services.acme-service.loadbalancer.server.port=80"
+      - "traefik.http.routers.acme-http.rule=PathPrefix(`/.well-known/acme-challenge/`)"
+      - "traefik.http.routers.acme-http.entrypoints=web"
+      - "traefik.http.routers.acme-http.service=acme-http@internal"
+      - "traefik.http.routers.acme-http.priority=9999"
+      - "traefik.http.routers.acme-http.tls=false"
 
     healthcheck:
       disable: true
