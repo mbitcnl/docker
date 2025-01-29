@@ -54,6 +54,11 @@ services:
         - "traefik.http.middlewares.traefik-ipwhitelist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
         # Deze niet weghalen ander port missing error
         - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+        # ACME HTTP Challange router
+        - "traefik.http.routers.acme-http.rule=PathPrefix(`/.well-known/acme-challenge/`)"
+        - "traefik.http.routers.acme-http.entrypoints=web"
+        - "traefik.http.routers.acme-http.service=api@internal"
+        - "traefik.http.routers.acme-http.priority=999"
 
 networks:
   traefik-proxy:
