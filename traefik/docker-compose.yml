@@ -8,14 +8,14 @@ services:
     command:
       - "--api=true"
       - "--api.dashboard=true"
-      - "--entrypoints.web.address=:${TRAEFIK_ENTRYPOINT_HTTP}"
-      - "--entrypoints.websecure.address=:${TRAEFIK_ENTRYPOINT_HTTPS}"
+      - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=traefik-proxy"
-      - "--log.level=DEBUG"
-      - "--log.filepath=/var/log/traefik.log"
-      - "--accesslog.filepath=/var/log/access.log"
+      - "--entrypoints.web.address=:${TRAEFIK_ENTRYPOINT_HTTP}"
+      - "--entrypoints.websecure.address=:${TRAEFIK_ENTRYPOINT_HTTPS}"
+      - "--log.level=INFO"
+      - "--accesslog=true"
       - "--certificatesresolvers.default.acme.httpchallenge=true"
       - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.default.acme.email=${TRAEFIK_LETSENCRYPT_MAIL}"
@@ -52,36 +52,28 @@ services:
     networks:
       - traefik-proxy
     environment:
-      - TRAEFIK_ENTRYPOINT_HTTP=${TRAEFIK_ENTRYPOINT_HTTP}
-      - TRAEFIK_ENTRYPOINT_HTTPS=${TRAEFIK_ENTRYPOINT_HTTPS}
+      - TRAEFIK_VERSION
+      - TRAEFIK_ENTRYPOINT_HTTP
+      - TRAEFIK_ENTRYPOINT_HTTPS
+      - TRAEFIK_DASHBOARD_URL
+      - TRAEFIK_DASHBOARD_IPWITHLIST
+      - TRAEFIK_DASHBOARD_AUTH_USER
+      - TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH
+      - TRAEFIK_LETSENCRYPT_MAIL
       - TRAEFIK_PING=true
       - TRAEFIK_PING_ENTRYPOINT=traefik
       - TRAEFIK_ENTRYPOINTS_TRAEFIK_ADDRESS=:8082
       - TRAEFIK_API_INSECURE=true
     labels:
       - "traefik.enable=true"
-
-      # Router configuratie voor het dashboard
       - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.middlewares=dashboard-auth,dashboard-ipwhitelist"
       - "traefik.http.routers.dashboard.tls=true"
       - "traefik.http.routers.dashboard.tls.certresolver=default"
-      - "traefik.http.routers.dashboard.tls.domains[0].main=${TRAEFIK_DASHBOARD_URL}"
-
-      # Middleware koppelen (IPAllowList en Basic Auth)
-      - "traefik.http.routers.dashboard.middlewares=ip-allowlist@docker,auth@docker"
-
-      # IPAllowList Middleware
-      - "traefik.http.middlewares.ip-allowlist.ipallowlist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
-
-      # Basic Auth Middleware
-      - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
-
-      # Rate Limit Middleware
-      - "traefik.http.middlewares.dashboard-ratelimit.ratelimit.average=100"
-      - "traefik.http.middlewares.dashboard-ratelimit.ratelimit.burst=50"
-      - "traefik.http.routers.dashboard.middlewares=ip-allowlist@docker,auth@docker,dashboard-ratelimit@docker"
+      - "traefik.http.middlewares.dashboard-ipwhitelist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
+      - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
 
     healthcheck:
       disable: true
