@@ -18,7 +18,8 @@ services:
       - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
       - "--certificatesresolvers.default.acme.httpchallenge=true"
       - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web"
-      - "--entrypoints.web.http.redirections.entrypoint.enabled=false"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--log.level=DEBUG"
     ports:
       - target: ${TRAEFIK_ENTRYPOINT_HTTP}
