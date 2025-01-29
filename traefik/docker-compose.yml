@@ -26,13 +26,13 @@ services:
       - "--accesslog=true"
 
     ports:
-      - published: ${TRAEFIK_ENTRYPOINT_HTTP}
-        target: ${TRAEFIK_ENTRYPOINT_HTTP}
-        mode: ingress
+      - target: ${TRAEFIK_ENTRYPOINT_HTTP}
+        published: ${TRAEFIK_ENTRYPOINT_HTTP}
+        mode: host
         protocol: tcp
-      - published: ${TRAEFIK_ENTRYPOINT_HTTPS}
-        target: ${TRAEFIK_ENTRYPOINT_HTTPS}
-        mode: ingress
+      - target: ${TRAEFIK_ENTRYPOINT_HTTPS}
+        published: ${TRAEFIK_ENTRYPOINT_HTTPS}
+        mode: host
         protocol: tcp
 
     volumes:
@@ -48,15 +48,6 @@ services:
       placement:
         constraints:
           - node.role == manager
-        preferences:
-          - spread: node.id
-      update_config:
-        parallelism: 1
-        delay: 10s
-        order: start-first
-      restart_policy:
-        condition: any
-        delay: 5s
       labels:
         - "traefik.enable=true"
         # Dashboard configuratie
@@ -66,7 +57,11 @@ services:
         - "traefik.http.routers.dashboard.middlewares=dashboard-auth,dashboard-ipallowlist"
         - "traefik.http.routers.dashboard.tls=true"
         - "traefik.http.routers.dashboard.tls.certresolver=default"
-             
+        
+        # Expliciet port mapping voor de service
+        - "traefik.http.services.api.loadbalancer.server.port=8080"
+        - "traefik.http.services.api.loadbalancer.server.scheme=http"
+        
         # Middlewares
         - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
         - "traefik.http.middlewares.dashboard-ipallowlist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
