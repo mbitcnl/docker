@@ -18,7 +18,7 @@ services:
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       # ACME (Let's Encrypt) configuratie
       - "--certificatesresolvers.default.acme.email=${TRAEFIK_LETSENCRYPT_MAIL}"
-      - "--certificatesresolvers.default.acme.storage=/data/traefik/acme.json"
+      - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
       - "--certificatesresolvers.default.acme.httpchallenge=true"
       - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web"
       # Logging
@@ -37,7 +37,7 @@ services:
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${STORAGE_LOCATION}/traefik:/data/traefik
+      - ${STORAGE_LOCATION}/letsencrypt:/letsencrypt
 
     networks:
       - traefik-proxy
