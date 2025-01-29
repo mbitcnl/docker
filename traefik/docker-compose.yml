@@ -4,55 +4,73 @@ version: '3.8'
 
 services:
   traefik:
-    image: traefik:${TRAEFIK_VERSION}
+    image: traefik:v2.10
     command:
-      - "--api"
       - "--api.dashboard=true"
       - "--providers.docker=true"
+      - "--providers.docker.swarmmode=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=traefik-proxy"
       - "--entrypoints.web.address=:${TRAEFIK_ENTRYPOINT_HTTP}"
       - "--entrypoints.websecure.address=:${TRAEFIK_ENTRYPOINT_HTTPS}"
-      - "--certificatesresolvers.default.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      # HTTP -> HTTPS redirect
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      # ACME (Let's Encrypt) configuratie
       - "--certificatesresolvers.default.acme.email=${TRAEFIK_LETSENCRYPT_MAIL}"
-      - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.default.acme.storage=/data/traefik/acme.json"
       - "--certificatesresolvers.default.acme.httpchallenge=true"
       - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web"
-      - "--entrypoints.web.http.redirections.entryPoint=false"
-      - "--log.level=DEBUG"
+      # Logging
+      - "--log.level=INFO"
+      - "--accesslog=true"
+
     ports:
-      - target: ${TRAEFIK_ENTRYPOINT_HTTP}
-        published: ${TRAEFIK_ENTRYPOINT_HTTP}
+      - target: 80
+        published: 80
+        protocol: tcp
         mode: host
-      - target: ${TRAEFIK_ENTRYPOINT_HTTPS}
-        published: ${TRAEFIK_ENTRYPOINT_HTTPS}
+      - target: 443
+        published: 443
+        protocol: tcp
         mode: host
+
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "/nfs/portainer/traefik/letsencrypt:/letsencrypt"
-      - "/nfs/portainer/traefik/logs:/var/log"
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${STORAGE_LOCATION}/traefik:/data/traefik
+
+    networks:
+      - traefik-proxy
+
     deploy:
-      mode: global
+      mode: replicated
+      replicas: 3
       placement:
         constraints:
           - node.role == manager
+        preferences:
+          - spread: node.id
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: any
+        delay: 5s
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.api.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
-        - "traefik.http.routers.api.service=api@internal"
-        - "traefik.http.routers.api.entrypoints=websecure"
-        - "traefik.http.routers.api.middlewares=auth,ipallowlist"
-        - "traefik.http.routers.api.tls=true"
-        - "traefik.http.routers.api.tls.certresolver=default"
-        - "traefik.http.routers.http-catchall.rule=HostRegexp(`{any:.*}`)"
-        - "traefik.http.routers.http-catchall.entrypoints=web"
-        - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
-        - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
-        - "traefik.http.middlewares.ipallowlist.ipallowlist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
-        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+        # Dashboard configuratie
+        - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
+        - "traefik.http.routers.dashboard.service=api@internal"
+        - "traefik.http.routers.dashboard.entrypoints=websecure"
+        - "traefik.http.routers.dashboard.middlewares=dashboard-auth,dashboard-ipallowlist"
+        - "traefik.http.routers.dashboard.tls=true"
+        - "traefik.http.routers.dashboard.tls.certresolver=default"
+        
+        # Middlewares
+        - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
+        - "traefik.http.middlewares.dashboard-ipallowlist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
 
 networks:
   traefik-proxy:
     external: true
-    name: traefik-proxy
-    driver: overlay
