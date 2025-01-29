@@ -41,21 +41,28 @@ services:
         parallelism: 1
         delay: 10s
         order: start-first
+        failure_action: rollback
       restart_policy:
-        condition: on-failure
+        condition: any
         delay: 5s
-        max_attempts: 3
+        max_attempts: 5
         window: 120s
       resources:
         limits:
           memory: 512M
+          cpus: '0.50'
         reservations:
           memory: 256M
+          cpus: '0.25'
     networks:
       - traefik-proxy
     environment:
       - TRAEFIK_ENTRYPOINT_HTTP=${TRAEFIK_ENTRYPOINT_HTTP}
       - TRAEFIK_ENTRYPOINT_HTTPS=${TRAEFIK_ENTRYPOINT_HTTPS}
+      - TRAEFIK_PING=true
+      - TRAEFIK_PING_ENTRYPOINT=traefik
+      - TRAEFIK_ENTRYPOINTS_TRAEFIK_ADDRESS=:8082
+      - TRAEFIK_API_INSECURE=true
     labels:
       - "traefik.enable=true"
 
@@ -82,9 +89,9 @@ services:
       - "traefik.http.routers.dashboard.middlewares=ip-allowlist@docker,auth@docker,dashboard-ratelimit@docker"
 
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/ping"]
-      interval: 30s
-      timeout: 5s
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 10s
+      timeout: 2s
       retries: 3
       start_period: 30s
 
