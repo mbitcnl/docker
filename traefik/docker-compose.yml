@@ -13,7 +13,7 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=traefik-proxy"
-      - "--log.level=DEBUG"
+      - "--log.level=INFO"
       - "--certificatesresolvers.default.acme.httpchallenge=true"
       - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.default.acme.email=${TRAEFIK_LETSENCRYPT_MAIL}"
@@ -30,6 +30,9 @@ services:
       - "/nfs/portainer/letsencrypt:/letsencrypt"
     deploy:
       mode: global
+      placement:
+        constraints:
+          - node.role == manager
     networks:
       - traefik-proxy
     environment:
@@ -55,8 +58,22 @@ services:
       # Basic Auth Middleware
       - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
 
+      # Rate Limit Middleware
+      - "traefik.http.middlewares.dashboard-ratelimit.ratelimit.average=100"
+      - "traefik.http.middlewares.dashboard-ratelimit.ratelimit.burst=50"
+      - "traefik.http.routers.dashboard.middlewares=ip-allowlist@docker,auth@docker,dashboard-ratelimit@docker"
+
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 10s
+      timeout: 2s
+      retries: 3
+
 networks:
   traefik-proxy:
     external: true
     name: traefik-proxy
     driver: overlay
+    attachable: true
+    driver_opts:
+      encrypted: "true"
