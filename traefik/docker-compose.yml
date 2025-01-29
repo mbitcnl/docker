@@ -13,6 +13,7 @@ services:
       - "--providers.docker.network=traefik-proxy"
       - "--entrypoints.web.address=:${TRAEFIK_ENTRYPOINT_HTTP}"
       - "--entrypoints.websecure.address=:${TRAEFIK_ENTRYPOINT_HTTPS}"
+      - "--certificatesresolvers.default.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.default.acme.email=${TRAEFIK_LETSENCRYPT_MAIL}"
       - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
       - "--certificatesresolvers.default.acme.httpchallenge=true"
@@ -64,6 +65,11 @@ services:
       - TRAEFIK_API_INSECURE=true
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.acme-http.rule=PathPrefix(`/.well-known/acme-challenge/`)"
+      - "traefik.http.routers.acme-http.entrypoints=web"
+      - "traefik.http.routers.acme-http.service=acme-http@internal"
+      - "traefik.http.routers.acme-http.priority=9999"
+      - "traefik.http.routers.acme-http.tls=false"
       - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
@@ -72,11 +78,6 @@ services:
       - "traefik.http.routers.dashboard.tls.certresolver=default"
       - "traefik.http.middlewares.dashboard-ipallowlist.ipallowlist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
       - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
-      - "traefik.http.routers.acme-http.rule=PathPrefix(`/.well-known/acme-challenge/`)"
-      - "traefik.http.routers.acme-http.entrypoints=web"
-      - "traefik.http.routers.acme-http.service=acme-http@internal"
-      - "traefik.http.routers.acme-http.priority=9999"
-      - "traefik.http.routers.acme-http.tls=false"
 
     healthcheck:
       disable: true
