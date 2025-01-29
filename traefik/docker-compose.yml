@@ -50,17 +50,14 @@ services:
       labels:
         - "traefik.enable=true"
         
-        # ACME HTTP Challenge Router (hoogste prioriteit)
-        - "traefik.http.routers.acme-http.rule=PathPrefix(`/.well-known/acme-challenge/`)"
-        - "traefik.http.routers.acme-http.entrypoints=web"
-        - "traefik.http.routers.acme-http.service=acme-http-service"
-        - "traefik.http.routers.acme-http.priority=999"
-        - "traefik.http.routers.acme-http.tls=false"
+        # ACME HTTP Challenge Router
+        - "traefik.http.routers.acme.entrypoints=web"
+        - "traefik.http.routers.acme.rule=Host(`${TRAEFIK_DASHBOARD_URL}`) && PathPrefix(`/.well-known/acme-challenge/`)"
+        - "traefik.http.routers.acme.service=api@internal"
+        - "traefik.http.routers.acme.priority=999"
+        - "traefik.http.routers.acme.tls=false"
         
-        # ACME service
-        - "traefik.http.services.acme-http-service.loadbalancer.server.port=8080"
-        
-        # Dashboard configuratie (lagere prioriteit)
+        # Dashboard configuratie
         - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
         - "traefik.http.routers.dashboard.service=api@internal"
         - "traefik.http.routers.dashboard.entrypoints=websecure"
