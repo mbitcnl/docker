@@ -43,42 +43,34 @@ services:
 
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 3  # Tijdelijk naar 1 voor troubleshooting
       placement:
         constraints:
           - node.role == manager
-        preferences:
-          - spread: node.id
-      update_config:
-        parallelism: 1
-        delay: 10s
-        order: start-first
       labels:
         - "traefik.enable=true"
-        # Dashboard configuratie
+        
+        # ACME HTTP Challenge Router (hoogste prioriteit)
+        - "traefik.http.routers.acme-http.rule=PathPrefix(`/.well-known/acme-challenge/`)"
+        - "traefik.http.routers.acme-http.entrypoints=web"
+        - "traefik.http.routers.acme-http.service=acme-http-service"
+        - "traefik.http.routers.acme-http.priority=999"
+        - "traefik.http.routers.acme-http.tls=false"
+        
+        # ACME service
+        - "traefik.http.services.acme-http-service.loadbalancer.server.port=8080"
+        
+        # Dashboard configuratie (lagere prioriteit)
         - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
         - "traefik.http.routers.dashboard.service=api@internal"
-        - "traefik.http.routers.dashboard.entrypoints=web,websecure"
+        - "traefik.http.routers.dashboard.entrypoints=websecure"
         - "traefik.http.routers.dashboard.middlewares=dashboard-auth,dashboard-ipallowlist"
         - "traefik.http.routers.dashboard.tls=true"
         - "traefik.http.routers.dashboard.tls.certresolver=default"
-        
-        # ACME HTTP Challenge Router (high priority)
-        - "traefik.http.routers.acme.rule=PathPrefix(`/.well-known/acme-challenge/`)"
-        - "traefik.http.routers.acme.entrypoints=web"
-        - "traefik.http.routers.acme.service=api@internal"
-        - "traefik.http.routers.acme.priority=255"
-        - "traefik.http.routers.acme.middlewares=acme-auth"
-        
-        # ACME specific middleware
-        - "traefik.http.middlewares.acme-auth.ipwhitelist.sourcerange=0.0.0.0/0"
-        
-        # Service configuration
-        - "traefik.http.services.api.loadbalancer.server.port=8080"
-        - "traefik.http.services.api.loadbalancer.server.scheme=http"
+        - "traefik.http.routers.dashboard.priority=1"
         
         # Middlewares
-        - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
+        - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}"
         - "traefik.http.middlewares.dashboard-ipallowlist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
 
 networks:
