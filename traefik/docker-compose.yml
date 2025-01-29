@@ -26,14 +26,14 @@ services:
       - "--accesslog=true"
 
     ports:
-      - target: ${TRAEFIK_ENTRYPOINT_HTTP}
-        published: ${TRAEFIK_ENTRYPOINT_HTTP}
+      - published: ${TRAEFIK_ENTRYPOINT_HTTP}
+        target: ${TRAEFIK_ENTRYPOINT_HTTP}
+        mode: ingress
         protocol: tcp
-        mode: host
-      - target: ${TRAEFIK_ENTRYPOINT_HTTPS}
-        published: ${TRAEFIK_ENTRYPOINT_HTTPS}
+      - published: ${TRAEFIK_ENTRYPOINT_HTTPS}
+        target: ${TRAEFIK_ENTRYPOINT_HTTPS}
+        mode: ingress
         protocol: tcp
-        mode: host
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
