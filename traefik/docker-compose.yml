@@ -43,7 +43,7 @@ services:
 
     deploy:
       mode: replicated
-      replicas: 3  # Tijdelijk naar 1 voor troubleshooting
+      replicas: 3
       placement:
         constraints:
           - node.role == manager
@@ -69,13 +69,6 @@ services:
         # Middlewares
         - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}"
         - "traefik.http.middlewares.dashboard-ipallowlist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
-      endpoints:
-        - targetPort: ${TRAEFIK_ENTRYPOINT_HTTP}
-          publishedPort: ${TRAEFIK_ENTRYPOINT_HTTP}
-          protocol: tcp
-        - targetPort: ${TRAEFIK_ENTRYPOINT_HTTPS}
-          publishedPort: ${TRAEFIK_ENTRYPOINT_HTTPS}
-          protocol: tcp
 
 networks:
   traefik-proxy:
