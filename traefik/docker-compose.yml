@@ -13,7 +13,10 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=traefik-proxy"
-      - "--log.level=INFO"
+      - "--log.level=DEBUG"
+      - "--log.filepath=/var/log/traefik.log"
+      - "--accesslog=true"
+      - "--accesslog.filepath=/var/log/access.log"
       - "--certificatesresolvers.default.acme.httpchallenge=true"
       - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.default.acme.email=${TRAEFIK_LETSENCRYPT_MAIL}"
@@ -28,6 +31,7 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "/nfs/portainer/traefik/letsencrypt:/letsencrypt"
+      - "/nfs/portainer/traefik/logs:/var/log"
     deploy:
       mode: global
       placement:
