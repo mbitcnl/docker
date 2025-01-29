@@ -1,12 +1,12 @@
 ## Deze config is alleen voor Docker Swarm
 
-version: "3.9"
+version: '3.8'
 
 services:
   traefik:
-    image: "traefik:${TRAEFIK_VERSION}"
+    image: traefik:${TRAEFIK_VERSION}
     command:
-      - "--api=true"
+      - "--api"
       - "--api.dashboard=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
@@ -65,11 +65,10 @@ services:
       - TRAEFIK_API_INSECURE=true
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.acme-http.rule=PathPrefix(`/.well-known/acme-challenge/`)"
-      - "traefik.http.routers.acme-http.entrypoints=web"
-      - "traefik.http.routers.acme-http.service=acme-http@internal"
-      - "traefik.http.routers.acme-http.priority=9999"
-      - "traefik.http.routers.acme-http.tls=false"
+      - "traefik.http.routers.acme.rule=PathPrefix(`/.well-known/acme-challenge/`)"
+      - "traefik.http.routers.acme.entrypoints=web"
+      - "traefik.http.routers.acme.priority=999999"
+      - "traefik.http.routers.acme.service=api@internal"
       - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
