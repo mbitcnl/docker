@@ -8,12 +8,12 @@ services:
     command:
       - "--api.dashboard=true"
       - "--providers.docker=true"
-      - "--providers.docker.swarmmode=true"
+      - "--providers.docker.swarmMode=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=traefik-proxy"
       # Entrypoints
-      - "--entrypoints.web.address=:${TRAEFIK_ENTRYPOINT_HTTP}"
-      - "--entrypoints.websecure.address=:${TRAEFIK_ENTRYPOINT_HTTPS}"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
       # ACME configuratie met staging
       - "--certificatesresolvers.default.acme.email=${TRAEFIK_LETSENCRYPT_MAIL}"
       - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
@@ -25,14 +25,14 @@ services:
       - "--accesslog=true"
 
     ports:
-      - target: ${TRAEFIK_ENTRYPOINT_HTTP}
-        published: ${TRAEFIK_ENTRYPOINT_HTTP}
-        mode: host
+      - target: 80
+        published: 80
         protocol: tcp
-      - target: ${TRAEFIK_ENTRYPOINT_HTTPS}
-        published: ${TRAEFIK_ENTRYPOINT_HTTPS}
-        mode: host
+        mode: ingress
+      - target: 443
+        published: 443
         protocol: tcp
+        mode: ingress
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
