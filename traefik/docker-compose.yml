@@ -14,8 +14,8 @@ services:
       # Entrypoints
       - "--entrypoints.web.address=:${TRAEFIK_ENTRYPOINT_HTTP}"
       - "--entrypoints.websecure.address=:${TRAEFIK_ENTRYPOINT_HTTPS}"
-      # Tijdelijk HTTP redirects uitzetten voor ACME challenge
-      - "--entrypoints.web.http.redirections.entrypoint=false"
+      # HTTP redirects uitzetten voor ACME Challange
+      - "--entrypoints.web.http.redirections=false"
       # ACME configuratie
       - "--certificatesresolvers.default.acme.email=${TRAEFIK_LETSENCRYPT_MAIL}"
       - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
