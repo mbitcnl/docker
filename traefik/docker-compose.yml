@@ -18,8 +18,7 @@ services:
       - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
       - "--certificatesresolvers.default.acme.httpchallenge=true"
       - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web"
-      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entryPoint=false"
       - "--log.level=DEBUG"
     ports:
       - target: ${TRAEFIK_ENTRYPOINT_HTTP}
@@ -39,14 +38,18 @@ services:
           - node.role == manager
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
-        - "traefik.http.routers.dashboard.service=api@internal"
-        - "traefik.http.routers.dashboard.entrypoints=websecure"
-        - "traefik.http.routers.dashboard.middlewares=dashboard-auth,dashboard-ipallowlist"
-        - "traefik.http.routers.dashboard.tls=true"
-        - "traefik.http.routers.dashboard.tls.certresolver=default"
-        - "traefik.http.middlewares.dashboard-ipallowlist.ipallowlist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
-        - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
+        - "traefik.http.routers.api.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
+        - "traefik.http.routers.api.service=api@internal"
+        - "traefik.http.routers.api.entrypoints=websecure"
+        - "traefik.http.routers.api.middlewares=auth,ipallowlist"
+        - "traefik.http.routers.api.tls=true"
+        - "traefik.http.routers.api.tls.certresolver=default"
+        - "traefik.http.routers.http-catchall.rule=HostRegexp(`{any:.*}`)"
+        - "traefik.http.routers.http-catchall.entrypoints=web"
+        - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+        - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
+        - "traefik.http.middlewares.ipallowlist.ipallowlist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
 networks:
   traefik-proxy:
