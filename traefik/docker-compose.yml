@@ -36,59 +36,19 @@ services:
       placement:
         constraints:
           - node.role == manager
-      update_config:
-        parallelism: 1
-        delay: 10s
-        order: stop-first
-      restart_policy:
-        condition: any
-        delay: 5s
-        window: 120s
-      resources:
-        limits:
-          memory: 256M
-        reservations:
-          memory: 128M
-    networks:
-      - traefik-proxy
-    environment:
-      - TRAEFIK_VERSION
-      - TRAEFIK_ENTRYPOINT_HTTP
-      - TRAEFIK_ENTRYPOINT_HTTPS
-      - TRAEFIK_DASHBOARD_URL
-      - TRAEFIK_DASHBOARD_IPWITHLIST
-      - TRAEFIK_DASHBOARD_AUTH_USER
-      - TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH
-      - TRAEFIK_LETSENCRYPT_MAIL
-      - TRAEFIK_PING=true
-      - TRAEFIK_PING_ENTRYPOINT=traefik
-      - TRAEFIK_ENTRYPOINTS_TRAEFIK_ADDRESS=:8082
-      - TRAEFIK_API_INSECURE=true
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.acme.rule=PathPrefix(`/.well-known/acme-challenge/`)"
-      - "traefik.http.routers.acme.entrypoints=web"
-      - "traefik.http.routers.acme.service=noop@internal"
-      - "traefik.http.routers.acme.priority=999999"
-      - "traefik.http.routers.acme.tls=false"
-      - "traefik.http.routers.acme.service=api@internal"
-      - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
-      - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.routers.dashboard.middlewares=dashboard-auth,dashboard-ipallowlist"
-      - "traefik.http.routers.dashboard.tls=true"
-      - "traefik.http.routers.dashboard.tls.certresolver=default"
-      - "traefik.http.middlewares.dashboard-ipallowlist.ipallowlist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
-      - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
-
-    healthcheck:
-      disable: true
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
+        - "traefik.http.routers.dashboard.service=api@internal"
+        - "traefik.http.routers.dashboard.entrypoints=websecure"
+        - "traefik.http.routers.dashboard.middlewares=dashboard-auth,dashboard-ipallowlist"
+        - "traefik.http.routers.dashboard.tls=true"
+        - "traefik.http.routers.dashboard.tls.certresolver=default"
+        - "traefik.http.middlewares.dashboard-ipallowlist.ipallowlist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
+        - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
 
 networks:
   traefik-proxy:
     external: true
     name: traefik-proxy
     driver: overlay
-    attachable: true
-    driver_opts:
-      encrypted: "true"
