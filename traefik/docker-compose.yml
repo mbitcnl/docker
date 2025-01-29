@@ -6,7 +6,7 @@ services:
   traefik:
     image: traefik:v2.10
     command:
-      - "--log.level=DEBUG"  # Extra debugging
+      - "--log.level=DEBUG"
       - "--api.dashboard=true"
       - "--providers.docker=true"
       - "--providers.docker.swarmMode=true"
@@ -40,19 +40,17 @@ services:
     networks:
       - traefik-proxy
     deploy:
-      mode: replicated
-      replicas: 3
+      mode: global  # Verander naar global voor betere port binding
       placement:
         constraints:
           - node.role == manager
       labels:
         - "traefik.enable=true"
-        # ACME HTTP Challenge route (moet eerst komen)
-        - "traefik.http.routers.acme.rule=PathPrefix(`/.well-known/acme-challenge/`)"
-        - "traefik.http.routers.acme.entrypoints=web"
-        - "traefik.http.routers.acme.service=api@internal"
-        - "traefik.http.routers.acme.priority=999"
-        - "traefik.http.routers.acme.tls=false"
+        # ACME HTTP Challenge route
+        - "traefik.http.routers.http-catchall.rule=PathPrefix(`/.well-known/acme-challenge/`)"
+        - "traefik.http.routers.http-catchall.entrypoints=web"
+        - "traefik.http.routers.http-catchall.service=api@internal"
+        - "traefik.http.routers.http-catchall.priority=1"
         # Dashboard configuratie
         - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
         - "traefik.http.routers.traefik.service=api@internal"
