@@ -12,6 +12,11 @@ services:
       - CADDY_INGRESS_NETWORKS=caddy-proxy
       - CADDY_DOCKER_PROXY_SERVICE_TASKS=true
       - CADDY_DOCKER_PROCESS_CADDYFILE=true
+      # Graceful shutdown configuratie
+      - CADDY_GRACEFUL_SHUTDOWN_TIMEOUT=30s
+      # TLS optimalisaties
+      - CADDY_TLS_CACHE_CAPACITY=10000
+      - CADDY_TLS_CACHE_TIMEOUT=12h
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /nfs/portainer/caddy/data:/data
@@ -26,24 +31,28 @@ services:
           - node.role == manager
       update_config:
         parallelism: 1
-        delay: 10s
+        delay: 30s
         order: start-first
+        failure_action: rollback
       restart_policy:
         condition: any
-        delay: 5s
-        max_attempts: 3
+        delay: 10s
+        max_attempts: 5
         window: 120s
       resources:
         limits:
           memory: 1G
+          cpus: '0.5'
         reservations:
           memory: 256M
+          cpus: '0.1'
+    stop_grace_period: 30s
     healthcheck:
       test: ["CMD", "wget", "--spider", "http://localhost:80"]
-      interval: 10s
-      timeout: 5s
+      interval: 30s
+      timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 30s
 
 networks:
   caddy-proxy:
