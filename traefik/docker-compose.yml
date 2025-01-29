@@ -51,11 +51,11 @@ services:
         - "traefik.enable=true"
         
         # ACME HTTP Challenge Router
-        - "traefik.http.routers.acme.entrypoints=web"
-        - "traefik.http.routers.acme.rule=Host(`${TRAEFIK_DASHBOARD_URL}`) && PathPrefix(`/.well-known/acme-challenge/`)"
-        - "traefik.http.routers.acme.service=api@internal"
-        - "traefik.http.routers.acme.priority=999"
-        - "traefik.http.routers.acme.tls=false"
+        - "traefik.http.routers.acme-http.entrypoints=web"
+        - "traefik.http.routers.acme-http.rule=Host(`${TRAEFIK_DASHBOARD_URL}`) && PathPrefix(`/.well-known/acme-challenge/`)"
+        - "traefik.http.routers.acme-http.service=api@internal"
+        - "traefik.http.routers.acme-http.priority=999"
+        - "traefik.http.routers.acme-http.tls=false"
         
         # Dashboard configuratie
         - "traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_URL}`)"
@@ -69,6 +69,13 @@ services:
         # Middlewares
         - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}"
         - "traefik.http.middlewares.dashboard-ipallowlist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
+      endpoints:
+        - targetPort: ${TRAEFIK_ENTRYPOINT_HTTP}
+          publishedPort: ${TRAEFIK_ENTRYPOINT_HTTP}
+          protocol: tcp
+        - targetPort: ${TRAEFIK_ENTRYPOINT_HTTPS}
+          publishedPort: ${TRAEFIK_ENTRYPOINT_HTTPS}
+          protocol: tcp
 
 networks:
   traefik-proxy:
