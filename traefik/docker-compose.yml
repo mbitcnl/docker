@@ -11,12 +11,12 @@ services:
       - "--providers.docker.swarmmode=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=traefik-proxy"
+      # Entrypoints
       - "--entrypoints.web.address=:${TRAEFIK_ENTRYPOINT_HTTP}"
       - "--entrypoints.websecure.address=:${TRAEFIK_ENTRYPOINT_HTTPS}"
-      # HTTP -> HTTPS redirect
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-      # ACME (Let's Encrypt) configuratie
+      # Tijdelijk HTTP redirects uitzetten voor ACME challenge
+      - "--entrypoints.web.http.redirections.entrypoint=false"
+      # ACME configuratie
       - "--certificatesresolvers.default.acme.email=${TRAEFIK_LETSENCRYPT_MAIL}"
       - "--certificatesresolvers.default.acme.storage=/letsencrypt/acme.json"
       - "--certificatesresolvers.default.acme.httpchallenge=true"
@@ -57,6 +57,12 @@ services:
         - "traefik.http.routers.dashboard.middlewares=dashboard-auth,dashboard-ipallowlist"
         - "traefik.http.routers.dashboard.tls=true"
         - "traefik.http.routers.dashboard.tls.certresolver=default"
+        
+        # ACME HTTP Challenge Router
+        - "traefik.http.routers.acme.rule=PathPrefix(`/.well-known/acme-challenge/`)"
+        - "traefik.http.routers.acme.entrypoints=web"
+        - "traefik.http.routers.acme.service=api@internal"
+        - "traefik.http.routers.acme.priority=255"
         
         # Expliciet port mapping voor de service
         - "traefik.http.services.api.loadbalancer.server.port=8080"
