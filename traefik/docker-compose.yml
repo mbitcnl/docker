@@ -66,10 +66,7 @@ services:
         - "traefik.http.routers.dashboard.middlewares=dashboard-auth,dashboard-ipallowlist"
         - "traefik.http.routers.dashboard.tls=true"
         - "traefik.http.routers.dashboard.tls.certresolver=default"
-        
-        # Port specificatie voor de service
-        - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
-        
+             
         # Middlewares
         - "traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH_USER}:${TRAEFIK_DASHBOARD_AUTH_PASSWORD_HASH}"
         - "traefik.http.middlewares.dashboard-ipallowlist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_IPWITHLIST}"
