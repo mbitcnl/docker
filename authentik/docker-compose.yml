@@ -48,9 +48,9 @@ services:
         - "traefik.http.routers.authentik-secure.entrypoints=websecure"
         - "traefik.http.routers.authentik-secure.tls.certresolver=ovhdns"
         - "traefik.http.services.authentik-secure.loadbalancer.server.port=9000"
-        # WebSocket configuratie
-        - "traefik.http.middlewares.authentik-secure.headers.customrequestheaders.Connection=upgrade"
-        - "traefik.http.middlewares.authentik-secure.headers.customrequestheaders.Upgrade=websocket"
+        # Alleen de WebSocket headers
+        - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Connection=Upgrade"
+        - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Upgrade=websocket"
         - "traefik.http.routers.authentik-secure.middlewares=authentik-headers"
     command: server
     environment:
