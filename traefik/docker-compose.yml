@@ -3,13 +3,11 @@ version: '3.8'
 services:
   traefik:
     image: traefik:v3.0
-    user: "1000:999"
     command: >
       sh -c '
       mkdir -p /etc/traefik/letsencrypt &&
       touch /etc/traefik/letsencrypt/acme.json &&
       chmod 600 /etc/traefik/letsencrypt/acme.json &&
-      chown -R 1000:999 /etc/traefik/letsencrypt &&
       exec traefik \
         --api.dashboard=true \
         --api.insecure=false \
