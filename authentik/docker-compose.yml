@@ -51,10 +51,11 @@ services:
         # Headers configuratie
         - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
         - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.X-Forwarded-For={clientIP}"
-        - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Host={http.request.host}"
-        # WebSocket specifieke configuratie
-        - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Connection=upgrade"
+        # Host header alleen doorsturen als het nodig is voor WebSocket
+        - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Connection=Upgrade"
         - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Upgrade=websocket"
+        # Belangrijk: passHostHeader toevoegen
+        - "traefik.http.services.authentik-secure.loadbalancer.passhostheader=true"
         - "traefik.http.routers.authentik-secure.middlewares=authentik-headers"
     command: server
     environment:
