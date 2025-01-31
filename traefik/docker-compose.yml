@@ -15,7 +15,7 @@ services:
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       - "--certificatesresolvers.ovhdns.acme.dnschallenge=true"
       - "--certificatesresolvers.ovhdns.acme.dnschallenge.provider=ovh"
-      - "--certificatesresolvers.ovhdns.acme.email=your-email@domain.com"
+      - "--certificatesresolvers.ovhdns.acme.email=${TRAEFIK_ACME_EMAIL}"
       - "--certificatesresolvers.ovhdns.acme.storage=/etc/traefik/acme/acme.json"
       # Use staging server for testing
       - "--certificatesresolvers.ovhdns.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
