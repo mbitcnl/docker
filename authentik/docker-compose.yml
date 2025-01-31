@@ -41,17 +41,22 @@ services:
           - node.role == manager
       restart_policy:
         condition: any
-    # Basis Caddy config
     labels:
-      - "caddy=${DNS_NAME}"
-      # Reverse proxy configuratie
-      - "caddy.reverse_proxy={{upstreams 9000}}"
+      - "traefik.enable=true"
+      # Basis routing configuratie
+      - "traefik.http.routers.authentik.rule=Host(`${DNS_NAME}`)"
+      - "traefik.http.routers.authentik.entrypoints=websecure"
+      - "traefik.http.routers.authentik.tls.certresolver=ovhdns"
+      - "traefik.http.services.authentik.loadbalancer.server.port=9000"
       
-      # Vereiste headers voor Authentik
-      - "caddy.reverse_proxy.header_up=X-Forwarded-Proto {http.request.scheme}"
-      - "caddy.reverse_proxy.header_up=X-Forwarded-For {http.request.remote.host}"
-      - "caddy.reverse_proxy.header_up=Host {http.request.host}"
-      - "caddy.reverse_proxy.header_up=Upgrade {http.request.header.Upgrade}"
+      # Headers voor Authentik
+      - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.X-Forwarded-For={clientIP}"
+      - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Host={http.request.host}"
+      - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Upgrade={http.request.header.Upgrade}"
+      
+      # Koppel de headers middleware aan de router
+      - "traefik.http.routers.authentik.middlewares=authentik-headers"
     command: server
     environment:
       AUTHENTIK_REDIS__HOST: redis
