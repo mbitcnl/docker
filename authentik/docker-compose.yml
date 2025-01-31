@@ -48,10 +48,13 @@ services:
         - "traefik.http.routers.authentik-secure.entrypoints=websecure"
         - "traefik.http.routers.authentik-secure.tls.certresolver=ovhdns"
         - "traefik.http.services.authentik-secure.loadbalancer.server.port=9000"
+        # Headers configuratie
         - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
         - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.X-Forwarded-For={clientIP}"
         - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Host={http.request.host}"
-        - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Upgrade={http.request.header.Upgrade}"
+        # WebSocket specifieke configuratie
+        - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Connection=upgrade"
+        - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Upgrade=websocket"
         - "traefik.http.routers.authentik-secure.middlewares=authentik-headers"
     command: server
     environment:
