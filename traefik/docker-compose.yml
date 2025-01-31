@@ -56,14 +56,14 @@ services:
         order: start-first
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.api.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)"
-        - "traefik.http.routers.api.service=api@internal"
-        - "traefik.http.routers.api.entrypoints=websecure"
-        - "traefik.http.routers.api.middlewares=auth,dashboard-ipwhitelist"
-        - "traefik.http.routers.api.tls.certresolver=ovhdns"
+        - "traefik.docker.network=traefik-public"
+        - "traefik.http.routers.traefik-api.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)"
+        - "traefik.http.routers.traefik-api.service=api@internal"
+        - "traefik.http.routers.traefik-api.entrypoints=websecure"
+        - "traefik.http.routers.traefik-api.middlewares=traefik-auth"
+        - "traefik.http.routers.traefik-api.tls.certresolver=ovhdns"
         - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
-        - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD}"
-        - "traefik.http.middlewares.dashboard-ipwhitelist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_WHITELIST}"
+        - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD}"
     volumes:
       - ${TRAEFIK_DATA_PATH}/letsencrypt:/etc/traefik/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
