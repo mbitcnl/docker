@@ -49,16 +49,8 @@ services:
         - "traefik.http.routers.authentik-secure.tls.certresolver=ovhdns"
         - "traefik.http.services.authentik-secure.loadbalancer.server.port=9000"
         # WebSocket configuratie
-        - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
-        - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.X-Forwarded-For={clientIP}"
-        - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.X-Real-IP={clientIP}"
-        # Specifieke WebSocket headers
-        - "traefik.http.middlewares.authentik-headers.headers.customRequestHeaders.Connection=Upgrade"
-        - "traefik.http.middlewares.authentik-headers.headers.customRequestHeaders.Upgrade=websocket"
-        # Enable websocket
-        - "traefik.http.middlewares.authentik-headers.headers.allowedHosts=${DNS_NAME}"
-        - "traefik.http.middlewares.authentik-headers.headers.sslRedirect=true"
-        - "traefik.http.middlewares.authentik-headers.headers.sslHost=${DNS_NAME}"
+        - "traefik.http.middlewares.authentik-secure.headers.customrequestheaders.Connection=upgrade"
+        - "traefik.http.middlewares.authentik-secure.headers.customrequestheaders.Upgrade=websocket"
         - "traefik.http.routers.authentik-secure.middlewares=authentik-headers"
     command: server
     environment:
