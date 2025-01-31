@@ -3,9 +3,6 @@ version: '3.8'
 services:
   nginx:
     image: nginx:latest
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
       - /nfs/portainer/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - /nfs/portainer/nginx/certs:/etc/nginx/certs:ro
@@ -16,9 +13,26 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        # Router voor HTTPS
+        - "traefik.http.routers.nginx-secure.rule=Host(`nginx.mbitc.nl`)"
+        - "traefik.http.routers.nginx-secure.service=nginx-service"
+        - "traefik.http.routers.nginx-secure.entrypoints=websecure"
+        - "traefik.http.routers.nginx-secure.tls=true"
+        - "traefik.http.routers.nginx-secure.tls.certresolver=ovhdns"
+        
+        # Service configuratie
+        - "traefik.http.services.nginx-service.loadbalancer.server.port=80"
+        
+        # HTTP naar HTTPS redirect
+        - "traefik.http.routers.nginx-redirect.rule=Host(`nginx.mbitc.nl`)"
+        - "traefik.http.routers.nginx-redirect.entrypoints=web"
+        - "traefik.http.routers.nginx-redirect.middlewares=redirect-to-https"
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     networks:
-      - nginx-net
+      - traefik-public
 
 networks:
-  nginx-net:
-    driver: overlay
+  traefik-public:
+    external: true
