@@ -11,6 +11,7 @@ services:
       - "--providers.swarm.network=traefik-public"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.traefik.address=:8080"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       - "--certificatesresolvers.ovhdns.acme.dnschallenge=true"
@@ -49,6 +50,7 @@ services:
         - "traefik.http.routers.api.tls.certresolver=ovhdns"
         - "traefik.http.routers.api.middlewares=auth"
         - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD}"
+        - "traefik.http.services.api.loadbalancer.server.port=8080"
 
 networks:
   traefik-public:
