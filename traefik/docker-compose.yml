@@ -55,16 +55,17 @@ services:
         delay: 10s
         order: start-first
       labels:
-        # Global Traefik enable
-        - traefik.enable=true
-        # Dashboard router
-        - traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)
-        - traefik.http.routers.dashboard.entrypoints=websecure
-        - traefik.http.routers.dashboard.service=api@internal
-        - traefik.http.routers.dashboard.tls.certresolver=ovhdns
-        # Dashboard auth
-        - traefik.http.routers.dashboard.middlewares=dashboard-auth
-        - traefik.http.middlewares.dashboard-auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD}
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik-public"
+        # Router
+        - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)"
+        - "traefik.http.routers.traefik.entrypoints=websecure"
+        - "traefik.http.routers.traefik.service=api@internal"
+        - "traefik.http.routers.traefik.tls=true"
+        - "traefik.http.routers.traefik.tls.certresolver=ovhdns"
+        # Auth
+        - "traefik.http.routers.traefik.middlewares=traefik-auth"
+        - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD}"
     volumes:
       - ${TRAEFIK_DATA_PATH}/letsencrypt:/etc/traefik/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
