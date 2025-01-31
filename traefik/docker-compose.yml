@@ -8,6 +8,7 @@ services:
       - "--log.format=json"
       - "--accesslog=true"
       - "--accesslog.format=json"
+      - "--api=true"
       - "--api.dashboard=true"
       - "--api.insecure=false"
       - "--providers.docker=true"
@@ -60,6 +61,7 @@ services:
         - "traefik.http.routers.dashboard.entrypoints=websecure"
         - "traefik.http.routers.dashboard.middlewares=auth,dashboard-ipwhitelist"
         - "traefik.http.routers.dashboard.tls.certresolver=ovhdns"
+        - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
         - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD}"
         - "traefik.http.middlewares.dashboard-ipwhitelist.ipwhitelist.sourcerange=${TRAEFIK_DASHBOARD_WHITELIST}"
     volumes:
