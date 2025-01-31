@@ -4,6 +4,10 @@ services:
   traefik:
     image: traefik:v3.0
     command:
+      - "--log.level=INFO"
+      - "--log.format=json"
+      - "--accesslog=true"
+      - "--accesslog.format=json"
       - "--api.dashboard=true"
       - "--api.insecure=false"
       - "--providers.docker=true"
