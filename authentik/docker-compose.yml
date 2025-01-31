@@ -45,10 +45,8 @@ services:
         - "traefik.enable=true"
         # Basis routing configuratie
         - "traefik.http.routers.authentik-secure.rule=Host(`${DNS_NAME}`)"
-        - "traefik.http.routers.authentik-secure.service=authentik-secure"
         - "traefik.http.routers.authentik-secure.entrypoints=websecure"
         - "traefik.http.routers.authentik-secure.tls.certresolver=ovhdns"
-        # Service definitie
         - "traefik.http.services.authentik-secure.loadbalancer.server.port=9000"
         # WebSocket ondersteuning toevoegen
         - "traefik.http.middlewares.authentik-websocket.headers.customrequestheaders.X-Forwarded-Proto=https"
