@@ -52,7 +52,7 @@ services:
         - "traefik.http.routers.api.entrypoints=websecure"
         - "traefik.http.routers.api.tls.certresolver=ovhdns"
         - "traefik.http.routers.api.middlewares=auth"
-        - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD}"
+        - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH}"
         - "traefik.http.services.api.loadbalancer.server.port=8080"
 
 networks:
