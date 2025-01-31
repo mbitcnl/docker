@@ -19,7 +19,8 @@ services:
       - "--certificatesresolvers.ovhdns.acme.dnschallenge.provider=ovh"
       - "--certificatesresolvers.ovhdns.acme.email=${TRAEFIK_ACME_EMAIL}"
       - "--certificatesresolvers.ovhdns.acme.storage=/etc/traefik/letsencrypt/acme.json"
-      - "--certificatesresolvers.ovhdns.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      #test staging server
+      #- "--certificatesresolvers.ovhdns.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
     ports:
       - target: 80
         published: 80
