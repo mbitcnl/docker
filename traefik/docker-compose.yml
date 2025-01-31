@@ -9,7 +9,7 @@ services:
       mkdir -p /etc/traefik/letsencrypt &&
       touch /etc/traefik/letsencrypt/acme.json &&
       chmod 600 /etc/traefik/letsencrypt/acme.json &&
-      chown -R 1000:1000 /etc/traefik/letsencrypt &&
+      chown -R 1000:999 /etc/traefik/letsencrypt &&
       exec traefik \
         --api.dashboard=true \
         --api.insecure=false \
