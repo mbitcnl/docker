@@ -55,6 +55,9 @@ services:
         - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Connection=Upgrade"
         - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Upgrade=websocket"
         - "traefik.http.routers.authentik-secure.middlewares=authentik-headers"
+        # Extra headers voor Authentik
+        - "traefik.http.middlewares.authentik-headers.headers.hostsProxyHeaders=X-Forwarded-Host"
+        - "traefik.http.middlewares.authentik-headers.headers.sslProxyHeaders.X-Forwarded-Proto=https"
         # HTTP to HTTPS redirect
         - "traefik.http.routers.authentik-redirect.rule=Host(`${DNS_NAME}`)"
         - "traefik.http.routers.authentik-redirect.entrypoints=web"
