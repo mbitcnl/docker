@@ -3,27 +3,22 @@ version: '3.8'
 services:
   traefik:
     image: traefik:v3.0
-    command: >
-      sh -c '
-      mkdir -p /etc/traefik/letsencrypt &&
-      touch /etc/traefik/letsencrypt/acme.json &&
-      chmod 600 /etc/traefik/letsencrypt/acme.json &&
-      exec traefik \
-        --api.dashboard=true \
-        --api.insecure=false \
-        --providers.docker=true \
-        --providers.docker.exposedbydefault=false \
-        --providers.docker.network=traefik-public \
-        --entrypoints.web.address=:80 \
-        --entrypoints.websecure.address=:443 \
-        --entrypoints.web.http.redirections.entrypoint.to=websecure \
-        --entrypoints.web.http.redirections.entrypoint.scheme=https \
-        --entrypoints.dashboard.address=:8080 \
-        --certificatesresolvers.ovhdns.acme.dnschallenge=true \
-        --certificatesresolvers.ovhdns.acme.dnschallenge.provider=ovh \
-        --certificatesresolvers.ovhdns.acme.email=${TRAEFIK_ACME_EMAIL} \
-        --certificatesresolvers.ovhdns.acme.storage=/etc/traefik/letsencrypt/acme.json \
-        --certificatesresolvers.ovhdns.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory'
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=false"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=traefik-public"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.dashboard.address=:8080"
+      - "--certificatesresolvers.ovhdns.acme.dnschallenge=true"
+      - "--certificatesresolvers.ovhdns.acme.dnschallenge.provider=ovh"
+      - "--certificatesresolvers.ovhdns.acme.email=${TRAEFIK_ACME_EMAIL}"
+      - "--certificatesresolvers.ovhdns.acme.storage=/etc/traefik/letsencrypt/acme.json"
+      - "--certificatesresolvers.ovhdns.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
     ports:
       - target: 80
         published: 80
