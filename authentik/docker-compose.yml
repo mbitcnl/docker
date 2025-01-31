@@ -48,20 +48,18 @@ services:
         - "traefik.http.routers.authentik-secure.entrypoints=websecure"
         - "traefik.http.routers.authentik-secure.tls.certresolver=ovhdns"
         - "traefik.http.services.authentik-secure.loadbalancer.server.port=9000"
-        # Headers voor proxy
-        - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
-        - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.X-Forwarded-Host=${DNS_NAME}"
-        # WebSocket support
+        # Combineer de middlewares in de juiste volgorde
+        - "traefik.http.routers.authentik-secure.middlewares=redirect-to-https,authentik-headers"
+        # Headers voor proxy en WebSocket
         - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Connection=Upgrade"
         - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Upgrade=websocket"
-        - "traefik.http.routers.authentik-secure.middlewares=authentik-headers"
-        # Extra headers voor Authentik
+        - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+        - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.X-Forwarded-Host=${DNS_NAME}"
         - "traefik.http.middlewares.authentik-headers.headers.hostsProxyHeaders=X-Forwarded-Host"
         - "traefik.http.middlewares.authentik-headers.headers.sslProxyHeaders.X-Forwarded-Proto=https"
         # HTTP to HTTPS redirect
         - "traefik.http.routers.authentik-redirect.rule=Host(`${DNS_NAME}`)"
         - "traefik.http.routers.authentik-redirect.entrypoints=web"
-        - "traefik.http.routers.authentik-redirect.middlewares=redirect-to-https"
         - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     command: server
     environment:
