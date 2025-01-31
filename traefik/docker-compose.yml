@@ -3,7 +3,7 @@ version: '3.8'
 services:
   traefik:
     image: traefik:v3.0
-    user: "1000:1000"
+    user: "1000:999"
     command: >
       sh -c '
       mkdir -p /etc/traefik/letsencrypt &&
