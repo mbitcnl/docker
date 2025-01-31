@@ -76,7 +76,7 @@ services:
       - "${COMPOSE_PORT_HTTPS:-9443}:9443"
     networks:
       - authentik-intern
-      - caddy-proxy
+      - traefik-public
       - authentik-app-proxy
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2024.12.2}
@@ -115,7 +115,7 @@ services:
 networks:
   authentik-intern:
     external: true
-  caddy-proxy:
+  traefik-public:
     external: true
   authentik-app-proxy:
     external: true  
