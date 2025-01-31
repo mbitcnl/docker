@@ -3,7 +3,12 @@ version: '3.8'
 services:
   traefik:
     image: traefik:v3.0
+    user: "1000:1000"
     command:
+      # Set up permissions first
+      - "/bin/sh"
+      - "-c"
+      - "mkdir -p /etc/traefik/letsencrypt && touch /etc/traefik/letsencrypt/acme.json && chmod 600 /etc/traefik/letsencrypt/acme.json && chown -R 1000:1000 /etc/traefik/letsencrypt && exec traefik"
       - "--api.dashboard=true"
       - "--api.insecure=false"
       - "--providers.docker=true"
