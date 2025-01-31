@@ -43,15 +43,20 @@ services:
         condition: any
       labels:
         - "traefik.enable=true"
-        # Basis routing configuratie
+        # HTTPS route
         - "traefik.http.routers.authentik-secure.rule=Host(`${DNS_NAME}`)"
         - "traefik.http.routers.authentik-secure.entrypoints=websecure"
         - "traefik.http.routers.authentik-secure.tls.certresolver=ovhdns"
         - "traefik.http.services.authentik-secure.loadbalancer.server.port=9000"
-        # Alleen de WebSocket headers
+        # WebSocket support
         - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Connection=Upgrade"
         - "traefik.http.middlewares.authentik-headers.headers.customrequestheaders.Upgrade=websocket"
         - "traefik.http.routers.authentik-secure.middlewares=authentik-headers"
+        # HTTP to HTTPS redirect
+        - "traefik.http.routers.authentik-redirect.rule=Host(`${DNS_NAME}`)"
+        - "traefik.http.routers.authentik-redirect.entrypoints=web"
+        - "traefik.http.routers.authentik-redirect.middlewares=redirect-to-https"
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     command: server
     environment:
       AUTHENTIK_REDIS__HOST: redis
