@@ -16,7 +16,7 @@ services:
       - "--certificatesresolvers.ovhdns.acme.dnschallenge=true"
       - "--certificatesresolvers.ovhdns.acme.dnschallenge.provider=ovh"
       - "--certificatesresolvers.ovhdns.acme.email=${TRAEFIK_ACME_EMAIL}"
-      - "--certificatesresolvers.ovhdns.acme.storage=/etc/traefik/acme/acme.json"
+      - "--certificatesresolvers.ovhdns.acme.storage=/etc/traefik/letsencrypt"
       # Use staging server for testing
       - "--certificatesresolvers.ovhdns.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
     ports:
@@ -54,7 +54,7 @@ services:
         - "traefik.http.routers.dashboard.tls.certresolver=ovhdns"
         - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD}"
     volumes:
-      - ${TRAEFIK_DATA_PATH}/acme:/etc/traefik/acme
+      - ${TRAEFIK_DATA_PATH}/letsencrypt:/etc/traefik/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
 networks:
