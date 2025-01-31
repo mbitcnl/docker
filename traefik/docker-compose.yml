@@ -5,20 +5,14 @@ services:
     image: traefik:v3.0
     command:
       - "--log.level=DEBUG"
-      - "--log.format=json"
-      - "--accesslog=true"
-      - "--accesslog.format=json"
       - "--api=true"
       - "--api.dashboard=true"
-      - "--api.insecure=false"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=traefik-public"
+      - "--providers.swarm=true"
+      - "--providers.swarm.network=traefik-public"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-      - "--entrypoints.dashboard.address=:8080"
       - "--certificatesresolvers.ovhdns.acme.dnschallenge=true"
       - "--certificatesresolvers.ovhdns.acme.dnschallenge.provider=ovh"
       - "--certificatesresolvers.ovhdns.acme.email=${TRAEFIK_ACME_EMAIL}"
@@ -33,10 +27,6 @@ services:
         published: 443
         protocol: tcp
         mode: ingress
-      - target: 8080
-        published: 8080
-        protocol: tcp
-        mode: ingress
     environment:
       - OVH_ENDPOINT=${OVH_ENDPOINT}
       - OVH_APPLICATION_KEY=${OVH_APPLICATION_KEY}
@@ -44,31 +34,21 @@ services:
       - OVH_CONSUMER_KEY=${OVH_CONSUMER_KEY}
     networks:
       - traefik-public
+    volumes:
+      - ${TRAEFIK_DATA_PATH}/letsencrypt:/etc/traefik/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     deploy:
       placement:
         constraints:
           - node.role == manager
-        max_replicas_per_node: 1
-      replicas: 3
-      update_config:
-        parallelism: 1
-        delay: 10s
-        order: start-first
       labels:
         - "traefik.enable=true"
-        - "traefik.docker.network=traefik-public"
-        # Router
-        - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)"
-        - "traefik.http.routers.traefik.entrypoints=websecure"
-        - "traefik.http.routers.traefik.service=api@internal"
-        - "traefik.http.routers.traefik.tls=true"
-        - "traefik.http.routers.traefik.tls.certresolver=ovhdns"
-        # Auth
-        - "traefik.http.routers.traefik.middlewares=traefik-auth"
-        - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD}"
-    volumes:
-      - ${TRAEFIK_DATA_PATH}/letsencrypt:/etc/traefik/letsencrypt
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+        - "traefik.http.routers.api.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)"
+        - "traefik.http.routers.api.service=api@internal"
+        - "traefik.http.routers.api.entrypoints=websecure"
+        - "traefik.http.routers.api.tls.certresolver=ovhdns"
+        - "traefik.http.routers.api.middlewares=auth"
+        - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_USER}:${TRAEFIK_DASHBOARD_PASSWORD}"
 
 networks:
   traefik-public:
