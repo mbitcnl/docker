@@ -63,10 +63,16 @@ services:
       - ${GITLAB_DATA_PATH}:/var/opt/gitlab
     networks:
       - gitlab-network
-      - caddy-proxy
+      - traefik-public
     labels:
-      - "caddy=${GITLAB_DOMAIN}"
-      - "caddy.reverse_proxy={{upstreams 80}}"
+      - "traefik.enable=true"
+      # HTTPS route
+      - "traefik.http.routers.gitlab-secure.rule=Host(`${GITLAB_DOMAIN}`)"
+      - "traefik.http.routers.gitlab-secure.entrypoints=websecure"
+      - "traefik.http.routers.gitlab-secure.tls=true"
+      - "traefik.http.routers.gitlab-secure.tls.certresolver=ovhdns"
+      - "traefik.http.services.gitlab-secure.loadbalancer.server.port=80"
+
     depends_on:
       - postgresql
       - redis
@@ -79,7 +85,7 @@ networks:
   gitlab-network:
     external: true
     name: gitlab-network
-  caddy-proxy:
+  traefik-public:
     external: true
-    name: caddy-proxy
+    name: traefik-public
     driver: overlay
