@@ -21,6 +21,8 @@ services:
       - "--certificatesresolvers.ovhdns.acme.storage=/etc/traefik/letsencrypt/acme.json"
       #test staging server
       #- "--certificatesresolvers.ovhdns.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--entrypoints.web.http"
+      - "--entrypoints.websecure.http"
     ports:
       - target: 80
         published: 80
