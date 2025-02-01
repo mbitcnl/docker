@@ -76,7 +76,6 @@ services:
         - "traefik.http.routers.gitlab-secure.tls=true"
         - "traefik.http.routers.gitlab-secure.tls.certresolver=ovhdns"
         - "traefik.http.services.gitlab-secure.loadbalancer.server.port=80"
-
     depends_on:
       - postgresql
       - redis
