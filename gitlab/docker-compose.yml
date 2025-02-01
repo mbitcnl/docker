@@ -64,22 +64,22 @@ services:
     networks:
       - gitlab-network
       - traefik-public
-    labels:
-      - "traefik.enable=true"
-      # HTTPS route
-      - "traefik.http.routers.gitlab-secure.rule=Host(`${GITLAB_DOMAIN}`)"
-      - "traefik.http.routers.gitlab-secure.entrypoints=websecure"
-      - "traefik.http.routers.gitlab-secure.tls=true"
-      - "traefik.http.routers.gitlab-secure.tls.certresolver=ovhdns"
-      - "traefik.http.services.gitlab-secure.loadbalancer.server.port=80"
-
-    depends_on:
-      - postgresql
-      - redis
     deploy:
       replicas: 1
       restart_policy:
         condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        # HTTPS route
+        - "traefik.http.routers.gitlab-secure.rule=Host(`${GITLAB_DOMAIN}`)"
+        - "traefik.http.routers.gitlab-secure.entrypoints=websecure"
+        - "traefik.http.routers.gitlab-secure.tls=true"
+        - "traefik.http.routers.gitlab-secure.tls.certresolver=ovhdns"
+        - "traefik.http.services.gitlab-secure.loadbalancer.server.port=80"
+
+    depends_on:
+      - postgresql
+      - redis
 
 networks:
   gitlab-network:
