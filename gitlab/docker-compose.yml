@@ -42,47 +42,48 @@ services:
   gitlab:
     image: gitlab/gitlab-ce:latest
     environment:
-      GITLAB_ROOT_PASSWORD: ${GITLAB_ROOT_PASSWORD}
-      GITLAB_OMNIBUS_CONFIG: external_url '${GITLAB_EXTERNAL_URL}';
-      gitlab_rails['db_adapter'] = 'postgresql';
-      gitlab_rails['db_host'] = 'postgresql';
-      gitlab_rails['db_port'] = 5432;
-      gitlab_rails['db_database'] = 'gitlabhq_production';
-      gitlab_rails['db_username'] = 'gitlab';
-      gitlab_rails['db_password'] = '${POSTGRES_PASSWORD}';
-      gitlab_rails['redis_host'] = 'redis';
-      nginx['listen_addresses'] = ['0.0.0.0'];
-      nginx['listen_port'] = 80;
-      nginx['listen_https'] = false;
-      nginx['proxy_set_headers'] = {
-        'X-Forwarded-Proto' => 'https',
-        'X-Forwarded-Ssl' => 'on',
-        'Host' => '$http_host'
-      };
-      gitlab_workhorse['listen_network'] = 'tcp';
-      gitlab_workhorse['listen_addr'] = '0.0.0.0:8181';
-      ## Activeer OmniAuth en configureer OpenID Connect voor Authentik SSO
-      gitlab_rails['omniauth_enabled'] = true;
-      gitlab_rails['omniauth_allow_single_sign_on'] = ['openid_connect'];
-      gitlab_rails['omniauth_block_auto_created_users'] = false;
-      gitlab_rails['omniauth_providers'] = [
-         {
-          "name" => "openid_connect",
-          "label" => "Authentik",
-          "args" => {
-          "name" => "openid_connect",
-          "scope" => ["openid", "profile", "email", "groups"],
-          "response_type" => "code",
-          "issuer" => "https://auth.mbitc.nl/application/o/gitlab",
-          "client_auth_method" => "basic",
-          "client_id" => "${AUTHENTIK_CLIENT_ID}",
-          "client_secret" => "${AUTHENTIK_CLIENT_SECRET}",
-          "discovery" => true,
-          "uid_field" => "preferred_username",
-          "send_scope_to_token_endpoint" => false
+      GITLAB_ROOT_PASSWORD: "${GITLAB_ROOT_PASSWORD}"
+      GITLAB_OMNIBUS_CONFIG: "
+        external_url '${GITLAB_EXTERNAL_URL}'
+        gitlab_rails['db_adapter'] = 'postgresql'
+        gitlab_rails['db_host'] = 'postgresql'
+        gitlab_rails['db_port'] = 5432
+        gitlab_rails['db_database'] = 'gitlabhq_production'
+        gitlab_rails['db_username'] = 'gitlab'
+        gitlab_rails['db_password'] = '${POSTGRES_PASSWORD}'
+        gitlab_rails['redis_host'] = 'redis'
+        nginx['listen_addresses'] = ['0.0.0.0']
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+        nginx['proxy_set_headers'] = {
+          'X-Forwarded-Proto' => 'https',
+          'X-Forwarded-Ssl' => 'on',
+          'Host' => '$http_host'
+        }
+        gitlab_workhorse['listen_network'] = 'tcp'
+        gitlab_workhorse['listen_addr'] = '0.0.0.0:8181'
+        gitlab_rails['omniauth_enabled'] = true
+        gitlab_rails['omniauth_allow_single_sign_on'] = ['openid_connect']
+        gitlab_rails['omniauth_block_auto_created_users'] = false
+        gitlab_rails['omniauth_providers'] = [
+          {
+            'name' => 'openid_connect',
+            'label' => 'Authentik',
+            'args' => {
+              'name' => 'openid_connect',
+              'scope' => ['openid', 'profile', 'email', 'groups'],
+              'response_type' => 'code',
+              'issuer' => 'https://authentik.example.com/application/o/gitlab',
+              'client_auth_method' => 'basic',
+              'client_id' => '${AUTHENTIK_CLIENT_ID}',
+              'client_secret' => '${AUTHENTIK_CLIENT_SECRET}',
+              'discovery' => true,
+              'uid_field' => 'preferred_username',
+              'send_scope_to_token_endpoint' => false
             }
           }
-        ];
+        ]
+      "
     volumes:
       - ${GITLAB_CONFIG_PATH}:/etc/gitlab
       - ${GITLAB_LOGS_PATH}:/var/log/gitlab
