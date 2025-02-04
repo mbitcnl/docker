@@ -73,13 +73,14 @@ services:
               'name' => 'openid_connect',
               'scope' => ['openid', 'profile', 'email', 'groups'],
               'response_type' => 'code',
-              'issuer' => 'https://auth.mbitc.nl.com/application/o/gitlab',
+              'issuer' => 'https://auth.mbitc.nl/application/o/gitlab',
               'client_auth_method' => 'basic',
               'client_id' => '${AUTHENTIK_CLIENT_ID}',
               'client_secret' => '${AUTHENTIK_CLIENT_SECRET}',
               'discovery' => true,
               'uid_field' => 'preferred_username',
-              'send_scope_to_token_endpoint' => false
+              'send_scope_to_token_endpoint' => false,
+              'verify_ssl' => false
             }
           }
         ];
