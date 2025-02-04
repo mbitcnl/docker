@@ -56,14 +56,13 @@ services:
           nginx['listen_port'] = 80;
           nginx['listen_https'] = false;
           nginx['proxy_set_headers'] = {
-            'X-Forwarded-Proto' => 'https',
-            'X-Forwarded-Ssl' => 'on',
-            'Host' => '$http_host'
+              'X-Forwarded-Proto' => 'https',
+              'X-Forwarded-Ssl' => 'on',
+              'Host' => '$http_host'
           };
           gitlab_workhorse['listen_network'] = 'tcp';
           gitlab_workhorse['listen_addr'] = '0.0.0.0:8181';
 
-          ## Enable OmniAuth and configure OpenID Connect for Authentik SSO
           gitlab_rails['omniauth_enabled'] = true;
           gitlab_rails['omniauth_allow_single_sign_on'] = ['openid_connect'];
           gitlab_rails['omniauth_block_auto_created_users'] = false;
@@ -75,7 +74,7 @@ services:
                 "name" => "openid_connect",
                 "scope" => ["openid", "profile", "email", "groups"],
                 "response_type" => "code",
-                "issuer" => "https://authentik.example.com/application/o/gitlab",
+                "issuer" => "https://auth.mbitc.nl/application/o/gitlab",
                 "client_auth_method" => "basic",
                 "client_id" => "${AUTHENTIK_CLIENT_ID}",
                 "client_secret" => "${AUTHENTIK_CLIENT_SECRET}",
@@ -85,12 +84,6 @@ services:
               }
             }
           ];
-
-          ## IMPORTANT:
-          ## Automatic admin assignment based on group membership is not directly supported by GitLab.
-          ## Users in the 'app_gitlab_admins' group should be granted admin privileges manually or via an external automation.
-          # gitlab_rails['omniauth_auto_link_admin'] = true;
-          # gitlab_rails['admin_groups'] = ['app_gitlab_admins'];
     volumes:
       - ${GITLAB_CONFIG_PATH}:/etc/gitlab
       - ${GITLAB_LOGS_PATH}:/var/log/gitlab
