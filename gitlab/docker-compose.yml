@@ -64,7 +64,13 @@ services:
         gitlab_workhorse['listen_addr'] = '0.0.0.0:8181';
         gitlab_rails['omniauth_enabled'] = true;
         gitlab_rails['omniauth_allow_single_sign_on'] = ['openid_connect'];
+        gitlab_rails['omniauth_sync_email_from_provider'] = 'openid_connect';
+        gitlab_rails['omniauth_sync_profile_from_provider'] = ['openid_connect'];
+        gitlab_rails['omniauth_sync_profile_attributes'] = ['email'];
+        gitlab_rails['omniauth_auto_sign_in_with_provider'] = 'openid_connect';
         gitlab_rails['omniauth_block_auto_created_users'] = false;
+        gitlab_rails['omniauth_auto_link_saml_user'] = true;
+        gitlab_rails['omniauth_auto_link_user'] = ['openid_connect'];
         gitlab_rails['omniauth_providers'] = [
           {
             'name' => 'openid_connect',
@@ -73,14 +79,18 @@ services:
               'name' => 'openid_connect',
               'scope' => ['openid', 'profile', 'email', 'groups'],
               'response_type' => 'code',
-              'issuer' => 'https://auth.mbitc.nl/application/o/gitlab',
-              'client_auth_method' => 'basic',
-              'client_id' => '${AUTHENTIK_CLIENT_ID}',
-              'client_secret' => '${AUTHENTIK_CLIENT_SECRET}',
+              'issuer' => 'https://auth.mbitc.nl/application/o/gitlab/',
               'discovery' => true,
+              'client_auth_method' => 'query',
               'uid_field' => 'preferred_username',
-              'send_scope_to_token_endpoint' => false,
-              'verify_ssl' => false
+              'send_scope_to_token_endpoint' => true,
+              'pkce' => true,
+              'verify_ssl' => false,
+              'client_options' => {
+                'identifier' => '${AUTHENTIK_CLIENT_ID}',
+                'secret' => '${AUTHENTIK_CLIENT_SECRET}',
+                'redirect_uri' => '${GITLAB_EXTERNAL_URL}/users/auth/openid_connect/callback'
+              }
             }
           }
         ];
