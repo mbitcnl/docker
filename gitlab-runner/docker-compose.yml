@@ -13,16 +13,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - gitlab-network
-    configs:
-      - source: runner-config
-        target: /etc/gitlab-runner/config.toml
-        mode: 0644
 
 networks:
   gitlab-network:
     external: true
     name: gitlab-network
-
-configs:
-  runner-config:
-    file: ./config.toml
