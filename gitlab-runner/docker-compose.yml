@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - ${GITLAB_RUNNER_CONFIG_PATH:-/etc/gitlab-runner}:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - gitlab-network
+    configs:
+      - source: runner-config
+        target: /etc/gitlab-runner/config.toml
+        mode: 0644
+
+networks:
+  gitlab-network:
+    external: true
+    name: gitlab-network
+
+configs:
+  runner-config:
+    file: ./config.toml
