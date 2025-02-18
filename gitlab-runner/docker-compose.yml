@@ -9,7 +9,7 @@ services:
       restart_policy:
         condition: on-failure
     volumes:
-      - ${GITLAB_RUNNER_CONFIG_PATH:-/etc/gitlab-runner}:/etc/gitlab-runner
+      - ${GITLAB_RUNNER_CONFIG_PATH:-/nfs/portainer/gitlab-runner}:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - gitlab-network
