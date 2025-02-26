@@ -14,12 +14,12 @@ services:
       - WUD_UI=true
       - WUD_UI_HOST=0.0.0.0
       - WUD_UI_PORT=${WUD_UI_PORT:-3000}
-      # OpenID Connect authenticatie
-      - WUD_AUTHENTICATION_OIDC=true
-      - WUD_AUTHENTICATION_OIDC_ISSUER_URL=${AUTHENTIK_ISSUER_URL:-https://authentik.example.com/application/o/wud/}
-      - WUD_AUTHENTICATION_OIDC_CLIENT_ID=${AUTHENTIK_CLIENT_ID:-wud-client-id}
-      - WUD_AUTHENTICATION_OIDC_CLIENT_SECRET=${AUTHENTIK_CLIENT_SECRET:-wud-client-secret}
-      - WUD_AUTHENTICATION_OIDC_REDIRECT_URL=${WUD_REDIRECT_URL:-https://wud.example.com/auth/oidc/callback}
+      # OpenID Connect authenticatie met Authentik
+      - WUD_AUTH_OIDC=true
+      - WUD_AUTH_OIDC_AUTHENTIK_DISCOVERY=${AUTHENTIK_DISCOVERY_URL:-https://authentik.example.com/application/o/wud/.well-known/openid-configuration}
+      - WUD_AUTH_OIDC_AUTHENTIK_CLIENT_ID=${AUTHENTIK_CLIENT_ID:-wud-client-id}
+      - WUD_AUTH_OIDC_AUTHENTIK_CLIENT_SECRET=${AUTHENTIK_CLIENT_SECRET:-wud-client-secret}
+      - WUD_AUTH_OIDC_AUTHENTIK_CALLBACK_URL=${WUD_CALLBACK_URL:-https://wud.example.com/auth/oidc/authentik/callback}
       # Optionele notificatie instellingen (uncomment indien gewenst)
       # - WUD_TRIGGER_APPRISE_URLS=${WUD_NOTIFICATIONS:-discord://webhook_id/webhook_token}
     volumes:
