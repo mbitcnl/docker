@@ -19,7 +19,7 @@ services:
       - WUD_AUTH_OIDC_AUTHENTIK_DISCOVERY=${AUTHENTIK_DISCOVERY_URL:-https://authentik.example.com/application/o/wud/.well-known/openid-configuration}
       - WUD_AUTH_OIDC_AUTHENTIK_CLIENT_ID=${AUTHENTIK_CLIENT_ID:-wud-client-id}
       - WUD_AUTH_OIDC_AUTHENTIK_CLIENT_SECRET=${AUTHENTIK_CLIENT_SECRET:-wud-client-secret}
-      - WUD_AUTH_OIDC_AUTHENTIK_CALLBACK_URL=${WUD_CALLBACK_URL:-https://wud.example.com/auth/oidc/authentik/callback}
+      - WUD_AUTH_OIDC_AUTHENTIK_REDIRECT=true
       # Optionele notificatie instellingen (uncomment indien gewenst)
       # - WUD_TRIGGER_APPRISE_URLS=${WUD_NOTIFICATIONS:-discord://webhook_id/webhook_token}
     volumes:
