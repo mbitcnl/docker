@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  wud:
+    image: fmartinou/whats-up-docker:latest
+    container_name: wud
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ:-Europe/Amsterdam}
+      # Configuratie voor Docker Swarm monitoring
+      - WUD_DOCKER_SOCKET_PATH=/var/run/docker.sock
+      - WUD_DOCKER_SWARM=true
+      # Configuratie voor WUD UI
+      - WUD_UI=true
+      - WUD_UI_HOST=0.0.0.0
+      - WUD_UI_PORT=${WUD_UI_PORT:-3000}
+      # OpenID Connect authenticatie
+      - WUD_AUTHENTICATION_OIDC=true
+      - WUD_AUTHENTICATION_OIDC_ISSUER_URL=${AUTHENTIK_ISSUER_URL:-https://authentik.example.com/application/o/wud/}
+      - WUD_AUTHENTICATION_OIDC_CLIENT_ID=${AUTHENTIK_CLIENT_ID:-wud-client-id}
+      - WUD_AUTHENTICATION_OIDC_CLIENT_SECRET=${AUTHENTIK_CLIENT_SECRET:-wud-client-secret}
+      - WUD_AUTHENTICATION_OIDC_REDIRECT_URL=${WUD_REDIRECT_URL:-https://wud.example.com/auth/oidc/callback}
+      # Optionele notificatie instellingen (uncomment indien gewenst)
+      # - WUD_TRIGGER_APPRISE_URLS=${WUD_NOTIFICATIONS:-discord://webhook_id/webhook_token}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${WUD_DATA_PATH:-./data}:/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.wud.rule=Host(`${WUD_SUBDOMAIN:-wud}.${DNS_NAME}`)"
+        - "traefik.http.routers.wud.entrypoints=websecure"
+        - "traefik.http.routers.wud.tls=true"
+        - "traefik.http.routers.wud.tls.certresolver=ovhdns"
+        - "traefik.http.services.wud.loadbalancer.server.port=${WUD_UI_PORT:-3000}"
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true
