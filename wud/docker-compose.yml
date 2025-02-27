@@ -14,14 +14,7 @@ services:
       - WUD_UI=true
       - WUD_UI_HOST=0.0.0.0
       - WUD_UI_PORT=${WUD_UI_PORT:-3000}
-      # OpenID Connect authenticatie met Authentik
-      - WUD_AUTH_OIDC_PROVIDER=authentik
-      - WUD_AUTH_OIDC_AUTHENTIK_CLIENTID=${AUTHENTIK_CLIENT_ID}
-      - WUD_AUTH_OIDC_AUTHENTIK_CLIENTSECRET=${AUTHENTIK_CLIENT_SECRET}
-      - WUD_AUTH_OIDC_AUTHENTIK_DISCOVERY=${AUTHENTIK_DISCOVERY_URL}
-      - WUD_LOG_LEVEL=debug
-      # Optionele notificatie instellingen (uncomment indien gewenst)
-      # - WUD_TRIGGER_APPRISE_URLS=${WUD_NOTIFICATIONS:-discord://webhook_id/webhook_token}
+      # GEEN authenticatie configuratie meer - dit wordt door Traefik afgehandeld
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${WUD_DATA_PATH:-./data}:/store
@@ -37,11 +30,19 @@ services:
         - "traefik.http.routers.wud.tls=true"
         - "traefik.http.routers.wud.tls.certresolver=ovhdns"
         - "traefik.http.services.wud.loadbalancer.server.port=${WUD_UI_PORT:-3000}"
+        # Authentik Forward Auth configuratie
+        - "traefik.http.routers.wud.middlewares=authentik-auth@docker"
+        - "traefik.http.middlewares.authentik-auth.forwardauth.address=https://auth.mbitc.nl:9443/outpost.goauthentik.io/auth/traefik"
+        - "traefik.http.middlewares.authentik-auth.forwardauth.trustForwardHeader=true"
+        - "traefik.http.middlewares.authentik-auth.forwardauth.authResponseHeaders=X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid"
     networks:
       - traefik-public
+      - authentik-intern  # Voeg Authentik netwerk toe om met Authentik te kunnen communiceren
     ports:
       - "3005:3000"
 
 networks:
   traefik-public:
+    external: true
+  authentik-intern:
     external: true
