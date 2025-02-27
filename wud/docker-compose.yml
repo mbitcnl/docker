@@ -39,6 +39,8 @@ services:
         - "traefik.http.services.wud.loadbalancer.server.port=${WUD_UI_PORT:-3000}"
     networks:
       - traefik-public
+    ports:
+      - "3005:3000"
 
 networks:
   traefik-public:
