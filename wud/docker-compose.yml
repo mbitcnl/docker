@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   wud:
-    image: fmartinou/whats-up-docker:2.23.0
+    image: fmartinou/whats-up-docker:latest
     container_name: wud
     restart: unless-stopped
     environment:
