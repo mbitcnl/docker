@@ -20,6 +20,9 @@ services:
       - WUD_AUTH_OIDC_AUTHENTIK_CLIENT_ID=${AUTHENTIK_CLIENT_ID:-wud-client-id}
       - WUD_AUTH_OIDC_AUTHENTIK_CLIENT_SECRET=${AUTHENTIK_CLIENT_SECRET:-wud-client-secret}
       - WUD_AUTH_OIDC_AUTHENTIK_REDIRECT=true
+      # Basic auth als fallback
+      - WUD_AUTH_BASIC=true
+      - WUD_AUTH_BASIC_USERS=admin:admin
       # Optionele notificatie instellingen (uncomment indien gewenst)
       # - WUD_TRIGGER_APPRISE_URLS=${WUD_NOTIFICATIONS:-discord://webhook_id/webhook_token}
     volumes:
